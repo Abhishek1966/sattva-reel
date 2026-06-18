@@ -1,0 +1,2807 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Sattva Reel Studio</title>
+  <meta name="theme-color" content="#14110c">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Sattva Reel">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" type="image/png" sizes="512x512" href="icon-512.png">
+  <link rel="apple-touch-icon" href="icon-192.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;700&family=DM+Serif+Display&family=Fraunces:opsz,wght,SOFT@9..144,400;9..144,500;9..144,600;9..144,700;9..144,900;9..144,400..900&family=Inter:wght@500;700&family=JetBrains+Mono:wght@400;500&family=Lato:wght@700&family=Manrope:wght@400;500;600;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      /* Dark premium Ayurvedic palette */
+      --bone:        #14110c;   /* app base — warm near-black */
+      --bone-warm:   #1b1710;
+      --paper:       rgba(38, 33, 25, 0.62);    /* glass panel */
+      --paper-soft:  rgba(50, 44, 34, 0.55);
+      --ink:         #f3ecdd;   /* primary text (light) */
+      --ink-soft:    #bcb09b;   /* secondary text */
+      --moss:        #87c5a4;   /* brand green — luminous on dark */
+      --moss-rich:   #6aa98a;
+      --moss-bright: #9bd6b4;
+      --moss-pale:   rgba(135, 197, 164, 0.12);
+      --clay:        #b3a087;   /* muted warm label */
+      --clay-soft:   rgba(179, 160, 135, 0.18);
+      --terracotta:  #e58c5d;   /* accent */
+      --terracotta-soft: rgba(229, 140, 93, 0.16);
+      --gold:        #e0b15a;
+      --gold-soft:   rgba(224, 177, 90, 0.16);
+      --glass:       rgba(244, 238, 226, 0.05);
+      --glass-edge:  rgba(244, 238, 226, 0.10);
+      --hairline:    rgba(244, 238, 226, 0.10);
+      --hairline-strong: rgba(244, 238, 226, 0.22);
+      --shadow-soft: 0 1px 0 rgba(244, 238, 226, 0.04) inset, 0 26px 50px -30px rgba(0, 0, 0, 0.7);
+      --shadow-stage: 0 44px 90px -34px rgba(0, 0, 0, 0.78), 0 8px 28px -10px rgba(0, 0, 0, 0.55);
+
+      --font-display: 'Fraunces', 'Cormorant Garamond', Georgia, serif;
+      --font-ui: 'Manrope', ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+      --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      color-scheme: dark;
+    }
+
+    * { box-sizing: border-box; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      position: relative;
+      color: var(--ink);
+      font-family: var(--font-ui);
+      font-feature-settings: "ss01", "ss02", "cv11";
+      background-color: var(--bone);
+      background-image:
+        radial-gradient(ellipse 60% 50% at 12% 0%, rgba(229, 140, 93, 0.16), transparent 60%),
+        radial-gradient(ellipse 70% 60% at 90% 12%, rgba(135, 197, 164, 0.14), transparent 65%),
+        radial-gradient(ellipse 80% 60% at 50% 108%, rgba(224, 177, 90, 0.10), transparent 60%);
+      background-attachment: fixed;
+    }
+
+    /* Grain overlay */
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 0;
+      opacity: 0.55;
+      mix-blend-mode: soft-light;
+      background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='220' height='220'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0.95 0 0 0 0 0.92 0 0 0 0 0.84 0 0 0 0.16 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+    }
+
+    /* Botanical hairline corner ornaments */
+    body::after {
+      content: "";
+      position: fixed;
+      top: 24px;
+      right: 32px;
+      width: 180px;
+      height: 180px;
+      pointer-events: none;
+      z-index: 0;
+      opacity: 0.42;
+      background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180' fill='none' stroke='%231f3a2e' stroke-width='0.8'><path d='M90 14 C 92 50, 92 100, 90 166 M 90 60 C 70 56, 56 40, 56 20 M 90 60 C 110 56, 124 40, 124 20 M 90 96 C 64 92, 44 72, 42 44 M 90 96 C 116 92, 136 72, 138 44 M 90 132 C 60 128, 36 104, 32 70 M 90 132 C 120 128, 144 104, 148 70'/></svg>");
+      background-repeat: no-repeat;
+    }
+
+    button, input, textarea, select { font: inherit; color: inherit; }
+
+    .app {
+      position: relative;
+      z-index: 1;
+      display: grid;
+      grid-template-columns: minmax(340px, 460px) minmax(320px, 1fr);
+      gap: 36px;
+      width: min(1500px, calc(100vw - 40px));
+      margin: 0 auto;
+      padding: 56px 0 80px;
+      align-items: start;
+    }
+
+    /* Editorial masthead — added as a pseudo-element on .controls */
+    .controls {
+      display: grid;
+      gap: 22px;
+      counter-reset: panel;
+    }
+
+    .controls::before {
+      content: "Sattva · An Ayurvedic Reel Studio";
+      display: block;
+      font-family: var(--font-mono);
+      font-size: 10.5px;
+      letter-spacing: 0.28em;
+      text-transform: uppercase;
+      color: var(--clay);
+      padding-bottom: 14px;
+      border-bottom: 1px solid var(--hairline);
+      position: relative;
+    }
+
+    .controls::after {
+      content: "";
+      grid-row: 1;
+      grid-column: 1;
+      position: relative;
+    }
+
+    /* PANEL */
+    .panel {
+      counter-increment: panel;
+      position: relative;
+      background:
+        linear-gradient(180deg, var(--paper-soft) 0%, var(--paper) 100%);
+      border: 1px solid var(--hairline);
+      border-radius: 2px;
+      box-shadow: var(--shadow-soft);
+      overflow: hidden;
+      opacity: 0;
+      transform: translateY(8px);
+      animation: rise 700ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    }
+
+    .panel:nth-of-type(1) { animation-delay: 80ms; }
+    .panel:nth-of-type(2) { animation-delay: 180ms; }
+    .panel:nth-of-type(3) { animation-delay: 280ms; }
+    .panel:nth-of-type(4) { animation-delay: 380ms; }
+    .panel:nth-of-type(5) { animation-delay: 480ms; }
+    .panel:nth-of-type(6) { animation-delay: 580ms; }
+
+    @keyframes rise {
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Decorative left edge */
+    .panel::before {
+      content: "";
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 2px;
+      background: linear-gradient(180deg, var(--moss), transparent 60%, var(--terracotta));
+      opacity: 0.32;
+    }
+
+    .panel-head {
+      padding: 22px 26px 16px;
+      border-bottom: 1px solid var(--hairline);
+      background: transparent;
+      position: relative;
+    }
+
+    .panel-head::before {
+      content: "№ " counter(panel, decimal-leading-zero);
+      display: block;
+      font-family: var(--font-mono);
+      font-size: 10px;
+      letter-spacing: 0.24em;
+      text-transform: uppercase;
+      color: var(--terracotta);
+      margin-bottom: 6px;
+    }
+
+    h1, h2 {
+      margin: 0;
+      font-family: var(--font-display);
+      font-weight: 600;
+      font-variation-settings: "opsz" 144, "SOFT" 50;
+      letter-spacing: -0.012em;
+      color: var(--moss);
+      line-height: 1.04;
+    }
+
+    h1 {
+      font-size: 38px;
+      font-variation-settings: "opsz" 144, "SOFT" 30;
+      font-weight: 700;
+    }
+
+    h1::first-letter { color: var(--terracotta); }
+
+    h2 {
+      font-size: 22px;
+      font-style: italic;
+      font-variation-settings: "opsz" 144, "SOFT" 100;
+    }
+
+    .sub {
+      margin-top: 10px;
+      color: var(--ink-soft);
+      font-size: 13.5px;
+      line-height: 1.55;
+      font-weight: 400;
+      max-width: 42ch;
+    }
+
+    .panel-body {
+      padding: 22px 26px 26px;
+      display: grid;
+      gap: 16px;
+    }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+    }
+
+    .field-tools {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 132px;
+      gap: 12px;
+      align-items: start;
+    }
+
+    .field-options { display: grid; gap: 8px; }
+
+    .field-tools > label:only-child { grid-column: 1 / -1; }
+
+    .compact-select { align-self: stretch; }
+
+    label {
+      display: grid;
+      gap: 7px;
+      color: var(--clay);
+      font-family: var(--font-mono);
+      font-size: 10.5px;
+      font-weight: 500;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+    }
+
+    input[type="text"],
+    input[type="file"],
+    textarea,
+    select {
+      width: 100%;
+      min-width: 0;
+      border: 1px solid var(--hairline);
+      border-radius: 9px;
+      background: var(--glass);
+      color: var(--ink);
+      padding: 11px 13px;
+      font-family: var(--font-ui);
+      font-size: 14px;
+      font-weight: 500;
+      letter-spacing: 0;
+      text-transform: none;
+      outline: none;
+      transition: border-color 160ms ease, box-shadow 160ms ease, background 160ms ease;
+    }
+
+    select {
+      appearance: none;
+      -webkit-appearance: none;
+      background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 8' fill='none' stroke='%2387c5a4' stroke-width='1.5'><path d='M1 1l5 5 5-5'/></svg>");
+      background-repeat: no-repeat;
+      background-position: right 12px center;
+      background-size: 10px;
+      padding-right: 32px;
+    }
+
+    input[type="file"] { padding: 9px; font-size: 13px; }
+
+    textarea {
+      min-height: 84px;
+      resize: vertical;
+      line-height: 1.5;
+    }
+
+    .image-prompt-grid { display: grid; gap: 12px; }
+
+    .image-prompt-row {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 96px;
+      gap: 12px;
+      align-items: end;
+    }
+
+    .image-prompt-row label { min-width: 0; }
+    .image-prompt-row .button { min-height: 44px; padding-left: 10px; padding-right: 10px; }
+    .image-prompt-grid textarea { min-height: 124px; font-size: 13px; }
+
+    input:focus, textarea:focus, select:focus {
+      border-color: var(--moss-bright);
+      background: rgba(244, 238, 226, 0.09);
+      box-shadow: 0 0 0 3px rgba(135, 197, 164, 0.18);
+    }
+
+    .actions {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 12px;
+    }
+
+    .button {
+      position: relative;
+      border: 1px solid var(--moss);
+      border-radius: 10px;
+      background: var(--moss);
+      color: #14110c;
+      min-height: 46px;
+      padding: 12px 18px;
+      font-family: var(--font-ui);
+      font-size: 12.5px;
+      font-weight: 600;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      cursor: pointer;
+      box-shadow: none;
+      transition: transform 180ms ease, background 180ms ease, color 180ms ease, border-color 180ms ease, box-shadow 180ms ease;
+      overflow: hidden;
+    }
+
+    /* Animated underline reveal via right-side accent */
+    .button::after {
+      content: "";
+      position: absolute;
+      left: 16px;
+      right: 16px;
+      bottom: 8px;
+      height: 1px;
+      background: var(--bone);
+      transform: scaleX(0);
+      transform-origin: left center;
+      transition: transform 280ms ease;
+      opacity: 0.6;
+    }
+
+    .button:hover:not(:disabled)::after { transform: scaleX(1); }
+
+    .button.secondary {
+      background: transparent;
+      color: var(--ink);
+      border: 1px solid var(--hairline-strong);
+      box-shadow: none;
+    }
+
+    .button.secondary::after { background: var(--ink); opacity: 0.5; }
+
+    .button:hover:not(:disabled) {
+      transform: translateY(-1px);
+      background: var(--moss-bright);
+      border-color: var(--moss-bright);
+      box-shadow: 0 14px 24px -16px rgba(31, 58, 46, 0.6);
+    }
+
+    .button.secondary:hover:not(:disabled) {
+      background: rgba(135, 197, 164, 0.10);
+      border-color: var(--moss);
+      color: var(--moss);
+    }
+
+    .button:active:not(:disabled),
+    .button.is-clicked:not(:disabled) {
+      transform: translateY(1px);
+    }
+
+    .button.is-done:not(:disabled) {
+      background: var(--moss);
+      border-color: var(--moss);
+      color: var(--bone);
+    }
+
+    .button.full { width: 100%; }
+    .button:disabled { cursor: not-allowed; opacity: 0.45; }
+
+    .status {
+      min-height: 18px;
+      color: var(--clay);
+      font-family: var(--font-mono);
+      font-size: 11.5px;
+      letter-spacing: 0.02em;
+      line-height: 1.55;
+    }
+
+    /* STAGE */
+    .stage-wrap {
+      position: sticky;
+      top: 32px;
+      display: grid;
+      justify-items: center;
+      gap: 18px;
+      opacity: 0;
+      transform: translateY(8px);
+      animation: rise 800ms 200ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    }
+
+    .stage-wrap::before {
+      content: "Preview · Live Loop";
+      font-family: var(--font-mono);
+      font-size: 10.5px;
+      letter-spacing: 0.28em;
+      text-transform: uppercase;
+      color: var(--clay);
+      padding-bottom: 4px;
+      border-bottom: 1px solid var(--hairline);
+      width: 100%;
+      text-align: center;
+    }
+
+    .stage {
+      width: min(420px, calc(100vw - 48px));
+      aspect-ratio: 9 / 16;
+      background: #0d0c0a;
+      border-radius: 4px;
+      border: 1px solid var(--hairline-strong);
+      box-shadow: var(--shadow-stage);
+      overflow: hidden;
+      position: relative;
+    }
+
+    .stage::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      border-radius: inherit;
+      box-shadow: inset 0 1px 0 rgba(255, 245, 220, 0.12);
+    }
+
+    canvas {
+      display: block;
+      width: 100%;
+      height: 100%;
+      background: var(--clay);
+    }
+
+    .preview-meta {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      justify-content: center;
+      color: var(--clay);
+      font-family: var(--font-mono);
+      font-size: 11.5px;
+      letter-spacing: 0.08em;
+      text-align: center;
+    }
+
+    .dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--terracotta);
+      animation: pulse 1.4s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 0.3; transform: scale(0.85); }
+      50% { opacity: 1; transform: scale(1.25); }
+    }
+
+    /* IMAGE SLOTS */
+    .bulk-upload-row {
+      display: flex;
+      gap: 12px;
+    }
+
+    .bulk-label {
+      flex: 1;
+      text-align: center;
+      font-size: 11.5px;
+      letter-spacing: 0.14em;
+      padding: 12px 8px;
+      cursor: pointer;
+    }
+
+    .image-slots {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 10px;
+    }
+
+    .img-slot {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      border: 1px dashed var(--hairline-strong);
+      border-radius: 8px;
+      padding: 6px;
+      background: var(--glass);
+      transition: border-color 160ms, background 160ms, opacity 160ms, transform 160ms;
+      position: relative;
+      cursor: grab;
+      user-select: none;
+    }
+
+    .img-slot:hover {
+      border-color: var(--moss);
+      transform: translateY(-1px);
+    }
+
+    .img-slot.drag-over {
+      border-color: var(--terracotta);
+      background: var(--terracotta-soft);
+      border-style: solid;
+    }
+
+    .img-slot.dragging { opacity: 0.35; }
+
+    .img-slot-label {
+      font-family: var(--font-mono);
+      font-size: 9px;
+      font-weight: 500;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--clay);
+      text-align: center;
+    }
+
+    .img-slot-preview {
+      aspect-ratio: 9 / 16;
+      background: rgba(135, 197, 164, 0.07);
+      border-radius: 5px;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      position: relative;
+    }
+
+    .img-slot-preview img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      pointer-events: none;
+    }
+
+    .img-slot-placeholder {
+      font-family: var(--font-display);
+      font-size: 20px;
+      font-style: italic;
+      color: var(--hairline-strong);
+      line-height: 1;
+    }
+
+    .img-slot-clear {
+      position: absolute;
+      top: 4px;
+      right: 4px;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      border: none;
+      background: rgba(31, 27, 20, 0.7);
+      color: var(--bone);
+      font-size: 10px;
+      cursor: pointer;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 0;
+      line-height: 1;
+      transition: background 160ms;
+    }
+
+    .img-slot-clear:hover { background: var(--terracotta); }
+
+    .img-slot.has-image .img-slot-clear { display: flex; }
+
+    .logo-row {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+    }
+
+    .logo-row label { flex: 1; }
+
+    /* SLIDER */
+    .slider-row {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .slider-row input[type="range"] {
+      flex: 1;
+      accent-color: var(--moss);
+      padding: 0;
+      border: none;
+      background: none;
+      box-shadow: none;
+      min-width: 0;
+      height: 4px;
+      cursor: pointer;
+    }
+
+    .slider-row input[type="range"]:focus {
+      box-shadow: none;
+      border: none;
+      background: none;
+    }
+
+    .speed-value {
+      font-size: 11px;
+      color: var(--moss);
+      font-family: var(--font-mono);
+      letter-spacing: 0.06em;
+      white-space: nowrap;
+      min-width: 86px;
+      text-align: right;
+    }
+
+    /* Scrollbar refinement (WebKit) */
+    ::-webkit-scrollbar { width: 10px; height: 10px; }
+    ::-webkit-scrollbar-track { background: var(--bone-warm); }
+    ::-webkit-scrollbar-thumb { background: var(--clay-soft); border-radius: 0; }
+    ::-webkit-scrollbar-thumb:hover { background: var(--clay); }
+
+    ::selection { background: var(--moss); color: var(--bone); }
+
+    /* ───── APP SHELL: PHONE-APP LAYOUT ───── */
+
+    /* Override editorial masthead — handled by .app-shell-top header now */
+    .controls::before,
+    .controls::after { content: none; display: none; }
+
+    /* Reset cascade animations from previous editorial layout */
+    .panel { animation: none; opacity: 1; transform: none; }
+    .panel::before { display: none; }
+
+    /* App-wide reset to single-column tab layout */
+    .app {
+      display: block;
+      grid-template-columns: none;
+      max-width: 760px;
+      width: min(100%, 760px);
+      padding: 28px 18px calc(96px + env(safe-area-inset-bottom, 0px));
+      gap: 0;
+    }
+
+    .controls { display: contents; }
+
+    /* Top app shell */
+    .app-shell-top {
+      position: sticky;
+      top: 0;
+      z-index: 60;
+      background: rgba(18, 15, 10, 0.72);
+      -webkit-backdrop-filter: blur(22px) saturate(135%);
+      backdrop-filter: blur(22px) saturate(135%);
+      border-bottom: 1px solid var(--hairline);
+    }
+
+    .brand-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      max-width: 760px;
+      margin: 0 auto;
+      padding: 14px 18px calc(14px + 1px);
+      gap: 18px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      min-width: 0;
+    }
+
+    .brand-leaf {
+      width: 28px;
+      height: 28px;
+      color: var(--moss);
+      flex-shrink: 0;
+    }
+
+    .brand-text {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      line-height: 1;
+      min-width: 0;
+    }
+
+    .brand-name {
+      font-family: var(--font-display);
+      font-size: 22px;
+      font-weight: 700;
+      font-style: italic;
+      font-variation-settings: "opsz" 144, "SOFT" 100;
+      color: var(--moss);
+      letter-spacing: -0.01em;
+    }
+
+    .brand-sub {
+      font-family: var(--font-mono);
+      font-size: 9px;
+      letter-spacing: 0.28em;
+      text-transform: uppercase;
+      color: var(--clay);
+      margin-top: 1px;
+    }
+
+    .current-section {
+      font-family: var(--font-mono);
+      font-size: 10.5px;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--terracotta);
+      white-space: nowrap;
+      text-align: right;
+      max-width: 50%;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    /* Tab content area */
+    .tab-content { position: relative; }
+
+    .tab-panel { display: none; }
+
+    .tab-panel.is-active {
+      display: block;
+      animation: tabSwap 380ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    }
+
+    @keyframes tabSwap {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Refine panel for app feel (softer, more card-like) */
+    .tab-panel .panel {
+      background:
+        linear-gradient(180deg, var(--paper-soft) 0%, var(--paper) 100%);
+      border: 1px solid var(--glass-edge);
+      border-radius: 16px;
+      -webkit-backdrop-filter: blur(18px) saturate(130%);
+      backdrop-filter: blur(18px) saturate(130%);
+      box-shadow:
+        0 1px 0 rgba(244, 238, 226, 0.06) inset,
+        0 28px 60px -34px rgba(0, 0, 0, 0.72);
+    }
+
+    .tab-panel .panel-head {
+      padding: 22px 22px 14px;
+      border-bottom: 1px solid var(--hairline);
+    }
+
+    .tab-panel .panel-head::before {
+      content: none;
+    }
+
+    .tab-panel .panel-body {
+      padding: 20px 22px 24px;
+      gap: 18px;
+    }
+
+    .tab-panel h2 {
+      font-size: 26px;
+      font-style: normal;
+      font-weight: 700;
+      font-variation-settings: "opsz" 144, "SOFT" 30;
+      letter-spacing: -0.014em;
+      color: var(--ink);
+    }
+
+    /* Next step hint card */
+    .next-step-hint {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 12px 14px;
+      margin-top: 4px;
+      background: var(--moss-pale);
+      border: 1px dashed rgba(135, 197, 164, 0.26);
+      border-radius: 10px;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--moss);
+      flex-wrap: wrap;
+    }
+
+    .hint-arrow {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      background: var(--moss);
+      color: var(--bone);
+      font-size: 13px;
+      font-family: var(--font-ui);
+    }
+
+    .hint-jump {
+      margin-left: auto;
+      background: transparent;
+      border: none;
+      color: var(--terracotta);
+      font-family: inherit;
+      font-size: inherit;
+      letter-spacing: inherit;
+      text-transform: inherit;
+      cursor: pointer;
+      padding: 6px 10px;
+      border-radius: 6px;
+      transition: background 160ms;
+    }
+
+    .hint-jump:hover { background: var(--terracotta-soft); }
+
+    /* Preview tab override — stage takes center stage */
+    .tab-panel[data-tab="preview"] .stage-wrap {
+      position: static;
+      animation: none;
+      opacity: 1;
+      transform: none;
+      gap: 22px;
+      padding-top: 8px;
+    }
+
+    .tab-panel[data-tab="preview"] .stage-wrap::before {
+      content: none;
+    }
+
+    .tab-panel[data-tab="preview"] .stage {
+      width: min(100%, 360px);
+      border-radius: 18px;
+    }
+
+    .export-card {
+      width: 100%;
+      max-width: 360px;
+      padding: 18px;
+      background:
+        linear-gradient(180deg, var(--paper-soft), var(--paper));
+      border: 1px solid var(--hairline);
+      border-radius: 14px;
+      display: grid;
+      gap: 12px;
+      box-shadow: 0 18px 40px -28px rgba(31, 27, 20, 0.36);
+    }
+
+    .primary-cta {
+      background: var(--terracotta);
+      border-color: var(--terracotta);
+      color: #14110c;
+      font-size: 13px;
+      letter-spacing: 0.18em;
+    }
+
+    .primary-cta:hover:not(:disabled) {
+      background: #f09a6b;
+      border-color: #f09a6b;
+    }
+
+    .export-divider {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      color: var(--clay);
+      font-family: var(--font-mono);
+      font-size: 10px;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+    }
+
+    .export-divider::before,
+    .export-divider::after {
+      content: "";
+      flex: 1;
+      height: 1px;
+      background: var(--hairline);
+    }
+
+    /* ── BOTTOM TAB NAV (mobile-first) ── */
+    .tab-nav {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      z-index: 60;
+      display: flex;
+      gap: 2px;
+      padding:
+        8px
+        max(env(safe-area-inset-right, 6px), 6px)
+        calc(8px + env(safe-area-inset-bottom, 0px))
+        max(env(safe-area-inset-left, 6px), 6px);
+      background: rgba(18, 15, 10, 0.82);
+      -webkit-backdrop-filter: blur(24px) saturate(140%);
+      backdrop-filter: blur(24px) saturate(140%);
+      border-top: 1px solid var(--hairline);
+      justify-content: space-between;
+    }
+
+    .tab-btn {
+      position: relative;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      min-height: 54px;
+      min-width: 0;
+      padding: 6px 4px;
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      color: var(--clay);
+      font-family: var(--font-mono);
+      font-size: 9.5px;
+      font-weight: 500;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      text-align: center;
+      border-radius: 10px;
+      transition: color 200ms ease, background 200ms ease, transform 160ms ease;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .tab-btn svg {
+      width: 22px;
+      height: 22px;
+      stroke-width: 1.6;
+    }
+
+    .tab-btn .tab-label {
+      line-height: 1;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 100%;
+    }
+
+    .tab-btn:active { transform: scale(0.93); }
+
+    .tab-btn.is-active {
+      color: var(--moss);
+      background: var(--moss-pale);
+    }
+
+    .tab-btn.is-active::before {
+      content: "";
+      position: absolute;
+      top: -1px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 30px;
+      height: 2px;
+      background: var(--terracotta);
+      border-radius: 2px;
+    }
+
+    /* Hide body botanical and grain ornament on small screens — too noisy */
+    @media (max-width: 760px) {
+      body::after { display: none; }
+      body::before { opacity: 0.35; }
+    }
+
+    /* Tighten panel on small phones */
+    @media (max-width: 560px) {
+      .app { padding: 22px 14px calc(96px + env(safe-area-inset-bottom, 0px)); }
+      .tab-panel .panel-head { padding: 20px 18px 12px; }
+      .tab-panel .panel-body { padding: 18px 18px 22px; gap: 16px; }
+      .tab-panel h2 { font-size: 22px; }
+      .grid-2, .actions, .field-tools { grid-template-columns: 1fr; }
+      .image-slots { grid-template-columns: repeat(5, 1fr); gap: 6px; }
+      .brand-bar { padding: 12px 14px; }
+      .brand-name { font-size: 20px; }
+      .image-prompt-row { grid-template-columns: 1fr; }
+      .image-prompt-row .button { min-height: 38px; }
+      .tab-btn .tab-label { font-size: 9px; letter-spacing: 0.08em; }
+    }
+
+    /* ── DESKTOP: 3-pane studio (rail · controls · live preview) ── */
+    @media (min-width: 1000px) {
+      .app-shell-top { border-bottom: 1px solid var(--hairline); }
+
+      .brand-bar { max-width: 1280px; padding: 18px 32px; }
+
+      .app {
+        max-width: 1280px;
+        width: min(100%, 1280px);
+        padding: 34px 32px 56px;
+        display: grid;
+        grid-template-columns: 172px minmax(0, 1fr) minmax(340px, 412px);
+        column-gap: 36px;
+        align-items: start;
+      }
+
+      /* Explicit placement so DOM order is irrelevant */
+      .app > .tab-nav      { grid-column: 1; grid-row: 1; }
+      .app > .tab-content  { grid-column: 2; grid-row: 1; min-width: 0; }
+      .app > .preview-pane { grid-column: 3; grid-row: 1; }
+
+      /* Left icon + label rail */
+      .tab-nav {
+        position: sticky;
+        top: 92px;
+        bottom: auto;
+        left: auto;
+        right: auto;
+        z-index: 1;
+        flex-direction: column;
+        gap: 4px;
+        padding: 0 16px 0 0;
+        background: transparent;
+        -webkit-backdrop-filter: none;
+        backdrop-filter: none;
+        border-top: none;
+        border-right: 1px solid var(--hairline);
+        justify-content: flex-start;
+      }
+
+      .tab-btn {
+        flex: 0 0 auto;
+        flex-direction: row;
+        justify-content: flex-start;
+        text-align: left;
+        gap: 14px;
+        padding: 12px 14px;
+        min-height: 46px;
+        font-size: 11px;
+        letter-spacing: 0.18em;
+        border-radius: 10px;
+      }
+
+      .tab-btn svg { width: 18px; height: 18px; }
+      .tab-btn .tab-label { max-width: none; }
+
+      .tab-btn.is-active {
+        background: var(--moss-pale);
+        color: var(--moss);
+      }
+
+      .tab-btn.is-active::before { display: none; }
+
+      /* Preview tab redundant on desktop — pane is always visible */
+      .tab-btn[data-tab="preview"] { display: none; }
+
+      /* Persistent live preview pane (3rd column) */
+      .preview-pane.tab-panel {
+        display: block;
+        position: sticky;
+        top: 92px;
+        animation: none;
+        opacity: 1;
+        transform: none;
+      }
+
+      .preview-pane .stage-wrap {
+        position: static;
+        opacity: 1;
+        transform: none;
+        animation: none;
+        gap: 16px;
+        padding-top: 0;
+      }
+
+      .preview-pane .stage-wrap::before { content: none; }
+      .preview-pane .stage { width: 100%; max-width: 412px; border-radius: 18px; }
+      .preview-pane .export-card { max-width: 412px; }
+
+      .current-section { display: none; }
+    }
+  </style>
+</head>
+<body>
+  <header class="app-shell-top">
+    <div class="brand-bar">
+      <div class="brand">
+        <svg class="brand-leaf" viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M16 4 C 10 10, 6 16, 7 24 C 14 26, 22 22, 26 14 C 24 10, 20 6, 16 4 Z"/>
+          <path d="M9 22 L 22 10"/>
+        </svg>
+        <div class="brand-text">
+          <span class="brand-name">Sattva</span>
+          <span class="brand-sub">Reel Studio</span>
+        </div>
+      </div>
+      <div class="current-section" id="currentSectionLabel">Library</div>
+    </div>
+  </header>
+
+  <main class="app">
+    <div class="tab-content">
+
+      <!-- Tab: Library -->
+      <section class="tab-panel is-active" data-tab="library" aria-label="Content Library">
+        <div class="panel">
+          <div class="panel-head">
+            <h2>Content Library</h2>
+            <div class="sub">Pick a post. Copy, caption, and hashtags auto-fill. Images still uploaded manually.</div>
+          </div>
+          <div class="panel-body">
+            <div class="grid-2">
+              <label>Phase
+                <select id="libPhase">
+                  <option value="1b">Phase 1b — Reels 16–30</option>
+                </select>
+              </label>
+              <label>Post
+                <select id="libPost"></select>
+              </label>
+            </div>
+            <button class="button full" id="libLoad" type="button">Load Post → Fill All Fields</button>
+            <div class="status" id="libStatus">Select a post above, then load.</div>
+            <div class="next-step-hint">
+              <span class="hint-arrow">↓</span>
+              Next: upload images
+              <button class="hint-jump" type="button" data-jump-tab="images">Images →</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Tab: Images -->
+      <section class="tab-panel" data-tab="images" aria-label="Images">
+        <div class="panel">
+          <div class="panel-head">
+            <h2>Images</h2>
+            <div class="sub">Upload five vertical images. Drag thumbnails to reorder. Tap a slot to replace.</div>
+          </div>
+          <div class="panel-body">
+            <div class="bulk-upload-row">
+              <label class="button secondary bulk-label" for="bulkUpload">Upload All 5</label>
+              <input id="bulkUpload" type="file" accept="image/*" multiple style="display:none">
+              <label class="button secondary bulk-label" for="logoImage">Upload Logo</label>
+              <input id="logoImage" type="file" accept="image/*" style="display:none">
+            </div>
+            <div class="image-slots" id="imageSlots"></div>
+            <div class="status">Upload All assigns left-to-right: Hook → Beat 1 → 2 → 3 → 4.</div>
+            <div class="next-step-hint">
+              <span class="hint-arrow">↓</span>
+              Next: edit reel copy
+              <button class="hint-jump" type="button" data-jump-tab="copy">Copy →</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Tab: Copy -->
+      <section class="tab-panel" data-tab="copy" aria-label="Reel Copy">
+        <div class="panel">
+          <div class="panel-head">
+            <h2>Reel Copy</h2>
+            <div class="sub">Hook plays first. Beats follow in order. Beat 4 is your CTA.</div>
+          </div>
+          <div class="panel-body">
+          <div class="field-tools">
+            <label>Hook
+              <textarea id="hook">Before medical tests existed, healers read your gut by body type alone.</textarea>
+            </label>
+            <div class="field-options">
+              <label>Color
+                <select id="hookColor" class="compact-select">
+                  <option value="white" selected>White</option>
+                  <option value="green">Green</option>
+                  <option value="brown">Brown</option>
+                </select>
+              </label>
+              <label>Align
+                <select id="hookAlign" class="compact-select">
+                  <option value="left" selected>Left</option>
+                  <option value="center">Center</option>
+                  <option value="right">Right</option>
+                  <option value="justify">Justified</option>
+                </select>
+              </label>
+            </div>
+          </div>
+          <div class="field-tools">
+            <label>Subline
+              <textarea id="subline">They were remarkably accurate. Science is only now proving why.</textarea>
+            </label>
+          </div>
+          <div class="field-tools">
+            <label>Beat 1 Label (optional)
+              <input id="beat1Label" type="text" value="Gut wisdom">
+            </label>
+          </div>
+          <div class="field-tools">
+            <label>Beat 1 Hook
+              <input id="beat1" type="text" value="Modern medicine gave us better tests.">
+            </label>
+            <div class="field-options">
+              <label>Color
+                <select id="beat1Color" class="compact-select">
+                  <option value="white" selected>White</option>
+                  <option value="green">Green</option>
+                  <option value="brown">Brown</option>
+                </select>
+              </label>
+              <label>Align
+                <select id="beat1Align" class="compact-select">
+                  <option value="center" selected>Center</option>
+                  <option value="left">Left</option>
+                  <option value="right">Right</option>
+                  <option value="justify">Justified</option>
+                </select>
+              </label>
+            </div>
+          </div>
+          <div class="field-tools">
+            <label>Beat 1 Subtext
+              <textarea id="beat1Subtext">And lost something vital.</textarea>
+            </label>
+          </div>
+          <div class="field-tools">
+            <label>Beat 2 Label (optional)
+              <input id="beat2Label" type="text" value="Body types">
+            </label>
+          </div>
+          <div class="field-tools">
+            <label>Beat 2 Hook
+              <input id="beat2" type="text" value="Vata. Pitta. Kapha.">
+            </label>
+            <div class="field-options">
+              <label>Color
+                <select id="beat2Color" class="compact-select">
+                  <option value="white" selected>White</option>
+                  <option value="green">Green</option>
+                  <option value="brown">Brown</option>
+                </select>
+              </label>
+              <label>Align
+                <select id="beat2Align" class="compact-select">
+                  <option value="center" selected>Center</option>
+                  <option value="left">Left</option>
+                  <option value="right">Right</option>
+                  <option value="justify">Justified</option>
+                </select>
+              </label>
+            </div>
+          </div>
+          <div class="field-tools">
+            <label>Beat 2 Subtext
+              <textarea id="beat2Subtext">Three gut types, each with distinct patterns, triggers, and needs.</textarea>
+            </label>
+          </div>
+          <div class="field-tools">
+            <label>Beat 3 Label (optional)
+              <input id="beat3Label" type="text" value="Modern proof">
+            </label>
+          </div>
+          <div class="field-tools">
+            <label>Beat 3 Hook
+              <input id="beat3" type="text" value="Modern research is confirming it.">
+            </label>
+            <div class="field-options">
+              <label>Color
+                <select id="beat3Color" class="compact-select">
+                  <option value="white" selected>White</option>
+                  <option value="green">Green</option>
+                  <option value="brown">Brown</option>
+                </select>
+              </label>
+              <label>Align
+                <select id="beat3Align" class="compact-select">
+                  <option value="center" selected>Center</option>
+                  <option value="left">Left</option>
+                  <option value="right">Right</option>
+                  <option value="justify">Justified</option>
+                </select>
+              </label>
+            </div>
+          </div>
+          <div class="field-tools">
+            <label>Beat 3 Subtext
+              <textarea id="beat3Subtext">Microbiome diversity, metabolic differences, and stress response vary by body type.</textarea>
+            </label>
+          </div>
+          <div class="field-tools">
+            <label>Beat 4 Label (optional)
+              <input id="ctaLabel" type="text" value="Mission">
+            </label>
+          </div>
+          <div class="field-tools">
+            <label>Beat 4 Hook
+              <textarea id="cta">Know your gut type. Follow @sattvaibs.</textarea>
+            </label>
+            <div class="field-options">
+              <label>Color
+                <select id="ctaColor" class="compact-select">
+                  <option value="white" selected>White</option>
+                  <option value="green">Green</option>
+                  <option value="brown">Brown</option>
+                </select>
+              </label>
+              <label>Align
+                <select id="ctaAlign" class="compact-select">
+                  <option value="center" selected>Center</option>
+                  <option value="left">Left</option>
+                  <option value="right">Right</option>
+                  <option value="justify">Justified</option>
+                </select>
+              </label>
+            </div>
+          </div>
+          <div class="field-tools">
+            <label>Beat 4 Subtext
+              <textarea id="ctaSubtext">We give you the knowledge and tools to understand which type you are.</textarea>
+            </label>
+          </div>
+          <div class="next-step-hint">
+            <span class="hint-arrow">↓</span>
+            Next: tweak style
+            <button class="hint-jump" type="button" data-jump-tab="style">Style →</button>
+          </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Tab: Style -->
+      <section class="tab-panel" data-tab="style" aria-label="Style">
+        <div class="panel">
+          <div class="panel-head">
+            <h2>Style</h2>
+            <div class="sub">Fonts, fit, overlay strength, and typing speed.</div>
+          </div>
+          <div class="panel-body">
+            <div class="grid-2">
+              <label>Image Fit
+                <select id="imageFit">
+                  <option value="cover">Cover frame</option>
+                  <option value="contain">Contain full image</option>
+                </select>
+              </label>
+              <label>Text Style
+                <select id="textAnimation">
+                  <option value="typewriter" selected>Typewriter</option>
+                  <option value="popup">Pop-up</option>
+                </select>
+              </label>
+              <label>Readability Overlay
+                <select id="overlayStrength">
+                  <option value="medium">Medium</option>
+                  <option value="strong" selected>Strong</option>
+                  <option value="extra">Extra</option>
+                </select>
+              </label>
+              <label>Brand Handle
+                <input id="handle" type="text" value="@sattvaibs">
+              </label>
+              <label>Headline Font
+                <select id="headlineFont">
+                  <option value="Georgia, serif">Georgia</option>
+                  <option value="'Playfair Display', Georgia, serif">Playfair Display</option>
+                  <option value="'Cormorant Garamond', Georgia, serif">Cormorant Garamond</option>
+                  <option value="'DM Serif Display', Georgia, serif">DM Serif Display</option>
+                  <option value="Inter, sans-serif">Inter</option>
+                  <option value="Lato, sans-serif">Lato</option>
+                </select>
+              </label>
+              <label>Body Font
+                <select id="bodyFont">
+                  <option value="Menlo, Monaco, Consolas, monospace">Monospace</option>
+                  <option value="Inter, sans-serif">Inter</option>
+                  <option value="Lato, sans-serif">Lato</option>
+                  <option value="Georgia, serif">Georgia</option>
+                </select>
+              </label>
+            </div>
+            <label>Typing Speed
+              <div class="slider-row">
+                <input type="range" id="textSpeed" min="6" max="60" step="1" value="24">
+                <span class="speed-value" id="speedValue">24 chars/sec</span>
+              </div>
+            </label>
+            <div class="next-step-hint">
+              <span class="hint-arrow">↓</span>
+              Optional: AI helper
+              <button class="hint-jump" type="button" data-jump-tab="ai">AI →</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Tab: AI Helper -->
+      <section class="tab-panel" data-tab="ai" aria-label="AI Helper">
+        <div class="panel">
+          <div class="panel-head">
+            <h2>AI Helper</h2>
+            <div class="sub">Paste source notes, copy the JSON prompt to Claude, then paste the JSON response back.</div>
+          </div>
+          <div class="panel-body">
+            <label>Raw Content
+              <textarea id="rawContent" placeholder="Paste carousel text, notes, or a campaign idea..."></textarea>
+            </label>
+            <div class="actions">
+              <button class="button secondary" id="copyPrompt" type="button">Copy Claude JSON Prompt</button>
+              <button class="button secondary" id="fillFields" type="button">Fill From JSON</button>
+              <button class="button secondary" id="copyImagePrompts" type="button">Copy Image Prompts</button>
+            </div>
+            <label>AI JSON Response
+              <textarea id="aiResponse" placeholder='{"hook":"...","subline":"...","beat1Label":"...","beat1":"...","beat1Subtext":"...","beat2Label":"...","beat2":"...","beat2Subtext":"...","beat3Label":"...","beat3":"...","beat3Subtext":"...","beat4Label":"...","beat4":"...","beat4Subtext":"...","imagePromptHook":"...","imagePromptBeat1":"...","imagePromptBeat2":"...","imagePromptBeat3":"...","imagePromptBeat4":"...","caption":"...","hashtags":"..."}'></textarea>
+            </label>
+            <div class="image-prompt-grid">
+              <div class="image-prompt-row">
+                <label>Hook Image Prompt
+                  <textarea id="imagePromptHook" placeholder="Generated image prompt for the opening hook image..."></textarea>
+                </label>
+                <button class="button secondary" type="button" data-copy-field="imagePromptHook">Copy</button>
+              </div>
+              <div class="image-prompt-row">
+                <label>Beat 1 Image Prompt
+                  <textarea id="imagePromptBeat1" placeholder="Generated image prompt for Beat 1..."></textarea>
+                </label>
+                <button class="button secondary" type="button" data-copy-field="imagePromptBeat1">Copy</button>
+              </div>
+              <div class="image-prompt-row">
+                <label>Beat 2 Image Prompt
+                  <textarea id="imagePromptBeat2" placeholder="Generated image prompt for Beat 2..."></textarea>
+                </label>
+                <button class="button secondary" type="button" data-copy-field="imagePromptBeat2">Copy</button>
+              </div>
+              <div class="image-prompt-row">
+                <label>Beat 3 Image Prompt
+                  <textarea id="imagePromptBeat3" placeholder="Generated image prompt for Beat 3..."></textarea>
+                </label>
+                <button class="button secondary" type="button" data-copy-field="imagePromptBeat3">Copy</button>
+              </div>
+              <div class="image-prompt-row">
+                <label>Beat 4 Image Prompt
+                  <textarea id="imagePromptBeat4" placeholder="Generated image prompt for Beat 4 or CTA..."></textarea>
+                </label>
+                <button class="button secondary" type="button" data-copy-field="imagePromptBeat4">Copy</button>
+              </div>
+            </div>
+            <label>Caption Output
+              <textarea id="caption" placeholder="Caption appears here after JSON fill..."></textarea>
+            </label>
+            <label>Hashtags Output
+              <input id="hashtags" type="text" placeholder="#ayurveda #guthealth #ibs #sattva #wellness">
+            </label>
+            <div class="status" id="aiStatus"></div>
+            <div class="next-step-hint">
+              <span class="hint-arrow">↓</span>
+              When ready: preview & export
+              <button class="hint-jump" type="button" data-jump-tab="preview">Preview →</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </div>
+
+    <!-- Live preview — persistent pane on desktop, a tab on mobile -->
+    <section class="tab-panel preview-pane" data-tab="preview" aria-label="Preview">
+      <div class="stage-wrap">
+        <div class="stage">
+          <canvas id="reel" width="1080" height="1920"></canvas>
+        </div>
+        <div class="preview-meta"><span class="dot"></span><span>Live 1080×1920 preview · <span id="previewDuration">11.0</span>s loop</span></div>
+        <div class="export-card">
+          <button class="button full primary-cta" id="download" type="button">Download Reel (.webm)</button>
+          <div class="status" id="downloadStatus">Chrome records the canvas to WebM. Convert to MP4 with HandBrake or ffmpeg afterwards. Duration: <span id="durationLabel">11.0</span>s.</div>
+          <div class="export-divider"><span>or</span></div>
+          <button class="button full" id="downloadPosts" type="button">Download 5 Posts · 4:5 PNG</button>
+          <div class="status" id="postsStatus">Five 1080×1350 carousel images, text baked in. Saved Hook → Beat 1–4.</div>
+        </div>
+      </div>
+    </section>
+
+    <nav class="tab-nav" role="tablist" aria-label="Sections">
+      <button class="tab-btn is-active" type="button" data-tab="library" role="tab" aria-selected="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M4 19V5a2 2 0 0 1 2-2h11v18H6a2 2 0 0 1-2-2Z"/>
+          <path d="M9 7h5M9 11h5"/>
+        </svg>
+        <span class="tab-label">Library</span>
+      </button>
+      <button class="tab-btn" type="button" data-tab="images" role="tab" aria-selected="false">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <rect x="3" y="4" width="18" height="16" rx="2"/>
+          <circle cx="9" cy="10" r="1.6"/>
+          <path d="M21 16l-5-5-9 9"/>
+        </svg>
+        <span class="tab-label">Images</span>
+      </button>
+      <button class="tab-btn" type="button" data-tab="copy" role="tab" aria-selected="false">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M14 3l7 7-11 11H3v-7L14 3Z"/>
+          <path d="M13 5l6 6"/>
+        </svg>
+        <span class="tab-label">Copy</span>
+      </button>
+      <button class="tab-btn" type="button" data-tab="style" role="tab" aria-selected="false">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M4 6h10M18 6h2M4 12h2M10 12h10M4 18h12M20 18h0"/>
+          <circle cx="16" cy="6" r="2"/>
+          <circle cx="8" cy="12" r="2"/>
+          <circle cx="18" cy="18" r="2"/>
+        </svg>
+        <span class="tab-label">Style</span>
+      </button>
+      <button class="tab-btn" type="button" data-tab="ai" role="tab" aria-selected="false">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M12 3l1.6 4.4L18 9l-4.4 1.6L12 15l-1.6-4.4L6 9l4.4-1.6L12 3Z"/>
+          <path d="M19 16l.7 2 2 .7-2 .7-.7 2-.7-2-2-.7 2-.7.7-2Z"/>
+        </svg>
+        <span class="tab-label">AI</span>
+      </button>
+      <button class="tab-btn" type="button" data-tab="preview" role="tab" aria-selected="false">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M6 4l14 8-14 8V4Z"/>
+        </svg>
+        <span class="tab-label">Preview</span>
+      </button>
+    </nav>
+  </main>
+
+  <script>
+    const canvas = document.getElementById("reel");
+    let ctx = canvas.getContext("2d");
+    let W = canvas.width;
+    let H = canvas.height;
+    let DURATION = 11000;
+    const FPS = 30;
+
+    // ── Content Library ───────────────────────────────────
+    const CONTENT_LIBRARY = [
+      { id:16, phase:"1b", title:"Are you a Vata gut?",
+        hook:"Your gut is unpredictable. Bloated one day, completely fine the next. You never know what’s coming.", subline:"",
+        beat1Label:"Exhausting", beat1:"When your gut is all over the place, you start eliminating everything — and nothing sticks. The inconsistency is exhausting.", beat1Subtext:"",
+        beat2Label:"Vata gut", beat2:"In Ayurveda, this pattern has a name: Vata gut. Variable digestion, irregular appetite, bloating with no obvious cause. A recognisable pattern with specific solutions.", beat2Subtext:"",
+        beat3Label:"Higher IBS rates", beat3:"Vata-dominant individuals show higher rates of IBS-D, IBS-M, and stress-triggered flares. Knowing your type points directly to your triggers.", beat3Subtext:"",
+        beat4Label:"Comment Vata", beat4:"Comment \"Vata\" if this is your gut. Follow @sattvaibs — gut knowledge built for your body type.", beat4Subtext:"",
+        caption:"Bloated one day. Completely fine the next. If your gut keeps changing the rules on you, there’s a name for it.\n\nIn Ayurveda it’s called a Vata gut — variable digestion, irregular appetite, bloating with no obvious cause. Not random. A recognisable pattern with specific triggers.\n\nThe exhausting part isn’t the bloating. It’s never knowing what’s coming. But once you know your type, the guessing stops.\n\nComment \"Vata\" if this sounds like your gut 👇 Follow @sattvaibs for the rest of the series — gut knowledge built around your body type. 🌿",
+        hashtags:"#IBS #GutHealth #VataDosha #Ayurveda #Bloating #IBSLife #GutHealing #DigestiveHealth" },
+
+      { id:17, phase:"1b", title:"Are you a Pitta gut?",
+        hook:"Your gut runs hot. Acid reflux, urgency, inflammation. Almost everything irritates it.", subline:"",
+        beat1Label:"Still burning", beat1:"You’ve been told to eat bland. Take antacids. Avoid spice. But you’re still burning. Generic advice for a gut that needs specific cooling.", beat1Subtext:"",
+        beat2Label:"Pitta gut", beat2:"In Ayurveda, this is a Pitta gut — high digestive fire that tips into inflammation. Understanding this changes not just what you eat, but when and how.", beat2Subtext:"",
+        beat3Label:"Inflammation markers", beat3:"Inflammatory markers are significantly elevated in a subset of IBS patients — aligning closely with Pitta presentations. Diet and stress protocols differ substantially from other gut types.", beat3Subtext:"",
+        beat4Label:"Comment Pitta", beat4:"Comment \"Pitta\" if your gut runs hot. Follow @sattvaibs — gut guidance built around your body type.", beat4Subtext:"",
+        caption:"Acid reflux. Urgency. That burning that bland food never quite fixes. If your gut runs hot, this one’s for you.\n\nAyurveda calls it a Pitta gut — high digestive fire that tips into inflammation. The fix isn’t \"eat blander.\" It’s knowing what cools your specific gut, and when.\n\nGeneric advice keeps a Pitta gut burning. Specific cooling changes everything.\n\nComment \"Pitta\" if your gut runs hot 👇 Follow @sattvaibs — guidance built around your body type. 🌿",
+        hashtags:"#IBS #GutHealth #PittaDosha #Ayurveda #AcidReflux #Inflammation #IBSLife #DigestiveHealth" },
+
+      { id:18, phase:"1b", title:"Are you a Kapha gut?",
+        hook:"Your digestion is slow. Heavy after meals. Food just sits there.", subline:"",
+        beat1Label:"Not how much", beat1:"You eat carefully, barely indulge, and still feel sluggish. People tell you to eat less — but the problem isn’t how much. It’s how your gut processes.", beat1Subtext:"",
+        beat2Label:"Kapha gut", beat2:"In Ayurveda, this is a Kapha gut — slow motility, heaviness, congestion in the gut. The fix isn’t restriction. It’s activation.", beat2Subtext:"",
+        beat3Label:"Slow transit", beat3:"Slow gut transit is a documented IBS subtype linked to microbiome composition, not just diet. The right movement, warmth, and meal timing can transform how this gut type functions.", beat3Subtext:"",
+        beat4Label:"Comment Kapha", beat4:"Comment \"Kapha\" if this is you. Follow @sattvaibs to find out your gut type.", beat4Subtext:"",
+        caption:"You eat carefully. You barely indulge. And you still feel heavy and sluggish after every meal. The problem isn’t how much you eat.\n\nAyurveda calls it a Kapha gut — slow motility, heaviness, that \"food just sits there\" feeling. The fix isn’t more restriction. It’s activation: warmth, movement, timing.\n\nEating less when your gut is slow often makes it slower. Knowing your type points you the other way.\n\nComment \"Kapha\" if this is you 👇 Follow @sattvaibs to find out your gut type. 🌿",
+        hashtags:"#IBS #GutHealth #KaphaDosha #Ayurveda #SlowDigestion #Bloating #IBSLife #DigestiveHealth" },
+
+      { id:19, phase:"1b", title:"Gluten isn’t everyone’s enemy",
+        hook:"Millions cut gluten and feel nothing. A few cut it and their life changes. Why?", subline:"",
+        beat1Label:"Wellness villain", beat1:"The wellness industry turned gluten into a universal villain. Most people who eliminate it see no improvement — because it was never their trigger.", beat1Subtext:"",
+        beat2Label:"Gut-type dependent", beat2:"Gluten sensitivity is real — but it’s gut-type dependent. Knowing your gut type tells you which camp you’re in before you spend months guessing.", beat2Subtext:"",
+        beat3Label:"6% of people", beat3:"Non-coeliac gluten sensitivity affects roughly 6% of the population. The majority who eliminate gluten do so without clinical indication — and without measurable benefit.", beat3Subtext:"",
+        beat4Label:"Save this", beat4:"Save this and follow @sattvaibs. Real gut knowledge, no wellness trends.", beat4Subtext:"",
+        caption:"Millions cut gluten and feel nothing. A few cut it and their whole life changes. So which one are you?\n\nNon-coeliac gluten sensitivity is real — but it affects roughly 6% of people. The wellness industry sold it as a universal villain. For most bodies, gluten was never the trigger.\n\nKnowing your gut type tells you which camp you’re in — before you spend months eating sad rice cakes for no reason.\n\nSave this before your next \"should I cut gluten?\" spiral 👇 Follow @sattvaibs — real gut knowledge, no trends. 🌿",
+        hashtags:"#IBS #GutHealth #Gluten #GlutenFree #GutHealing #IBSLife #FoodMyths #DigestiveHealth" },
+
+      { id:20, phase:"1b", title:"FODMAP isn’t the answer for everyone",
+        hook:"You tried the low FODMAP diet. It helped — then it stopped working.", subline:"",
+        beat1Label:"50% don’t sustain", beat1:"FODMAP is the most recommended IBS protocol. But up to 50% of patients don’t sustain improvement beyond a few months. That’s not a minor footnote.", beat1Subtext:"",
+        beat2Label:"Doesn’t fix root", beat2:"FODMAP reduces symptom load — it doesn’t fix the underlying dysfunction. Strict long-term elimination can starve the microbiome of the fibre it needs to heal.", beat2Subtext:"",
+        beat3Label:"Reduced diversity", beat3:"Long-term FODMAP restriction is associated with reduced microbiome diversity. Research now recommends short-term use plus deliberate reintroduction — not permanent elimination.", beat3Subtext:"",
+        beat4Label:"Save this", beat4:"Save this and follow @sattvaibs. We translate the research so you can make better choices.", beat4Subtext:"",
+        caption:"The low FODMAP diet helped… and then it stopped working. You’re not imagining it.\n\nFODMAP is the most recommended IBS protocol going — but up to half of people don’t sustain the improvement past a few months. It reduces your symptoms; it doesn’t fix what’s underneath.\n\nAnd strict long-term elimination can starve your gut of the fibre it needs to heal. The research now says: short-term, then reintroduce. Not forever.\n\nSave this for your next bad gut week 👇 Follow @sattvaibs — we translate the research so you don’t have to. 🌿",
+        hashtags:"#IBS #GutHealth #FODMAP #LowFODMAP #GutHealing #Microbiome #IBSLife #DigestiveHealth" },
+
+      { id:21, phase:"1b", title:"What you eat matters less than when and how you eat",
+        hook:"You’re obsessing over what’s on your plate. But the timing and pace of how you eat might matter more.", subline:"",
+        beat1Label:"How matters too", beat1:"Nutrition advice is almost entirely focused on food composition. Meal timing, eating pace, and mental state at mealtimes are rarely mentioned — but they’re major gut determinants.", beat1Subtext:"",
+        beat2Label:"Circadian digestion", beat2:"Your gut’s digestive enzymes follow a circadian rhythm. Eating the same meal at the wrong time changes how your body processes it.", beat2Subtext:"",
+        beat3Label:"Chrono-nutrition", beat3:"Chrono-nutrition research shows meal timing independently affects gut microbiome composition and digestion efficiency. Regardless of what’s being eaten.", beat3Subtext:"",
+        beat4Label:"Save this", beat4:"Save this and follow @sattvaibs. Practical gut guidance that goes beyond food lists.", beat4Subtext:"",
+        caption:"You’re agonising over what’s on your plate. Meanwhile the when and how might matter more.\n\nYour digestive enzymes run on a circadian rhythm. The same meal at the wrong time, or eaten fast and stressed, is processed completely differently — suppressed acid, slower motility.\n\nChrono-nutrition research is clear: timing affects your microbiome and digestion independently of the food itself. Slow down. Eat warm. Eat on a rhythm.\n\nSave this as your reminder to slow down at meals 👇 Follow @sattvaibs for guidance beyond food lists. 🌿",
+        hashtags:"#IBS #GutHealth #MealTiming #Ayurveda #GutHealing #ChronoNutrition #IBSLife #DigestiveHealth" },
+
+      { id:22, phase:"1b", title:"The medication nobody told you is affecting your gut",
+        hook:"The medication you took to get better might be one reason your gut is still struggling.", subline:"",
+        beat1Label:"Never discussed", beat1:"Antibiotics, NSAIDs, antacids, and hormonal contraceptives — their impact on the gut microbiome is almost never discussed at the point of prescription.", beat1Subtext:"",
+        beat2Label:"Heal intentionally", beat2:"These medications can disrupt the gut lining, reduce microbiome diversity, and alter gut motility. This isn’t a reason to avoid them. It’s a reason to heal intentionally after.", beat2Subtext:"",
+        beat3Label:"12 months impact", beat3:"A single antibiotic course can reduce gut microbiome diversity for up to 12 months. NSAIDs increase intestinal permeability. PPIs significantly alter the gut environment over time.", beat3Subtext:"",
+        beat4Label:"After antibiotics", beat4:"Tag someone who’s been through a rough course of antibiotics. Follow @sattvaibs for what to do after.", beat4Subtext:"",
+        caption:"The medication that helped you might be one reason your gut still isn’t right. Nobody mentions this at the pharmacy.\n\nAntibiotics, NSAIDs, antacids, the pill — some of the most prescribed drugs on earth. A single antibiotic course can lower your microbiome diversity for up to a year. PPIs reshape your whole gut environment.\n\nThis isn’t \"stop taking your meds.\" It’s \"heal intentionally afterwards\" — because almost no one tells you that part.\n\nTag someone who’s been through a rough course of antibiotics 👇 Follow @sattvaibs for what to do after. 🌿",
+        hashtags:"#IBS #GutHealth #Microbiome #GutHealing #Antibiotics #IBSLife #DigestiveHealth #GutHealthTips" },
+
+      { id:23, phase:"1b", title:"Your hormones and your gut are in constant conversation",
+        hook:"Your gut symptoms get worse before your period. Or when you’re under stress. That is not a coincidence.", subline:"",
+        beat1Label:"Hormones ignored", beat1:"Gut health advice almost never mentions hormones. But hormonal fluctuations directly affect gut motility, microbiome composition, and intestinal permeability.", beat1Subtext:"",
+        beat2Label:"Gut and hormones", beat2:"Oestrogen, progesterone, and cortisol each alter how your gut behaves. Your gut is a hormonal organ too.", beat2Subtext:"",
+        beat3Label:"73% of women", beat3:"73% of women with IBS report symptom worsening linked to menstrual cycles. The gut has hormone receptors — and responds to every shift in the endocrine system.", beat3Subtext:"",
+        beat4Label:"Comment 🌙", beat4:"Comment 🌙 if your gut tracks your cycle, and follow @sattvaibs. The full picture.", beat4Subtext:"",
+        caption:"Your gut gets worse right before your period. Or the moment stress hits. That’s not a coincidence — it’s chemistry.\n\nOestrogen, progesterone and cortisol each change how your gut behaves. 73% of women with IBS report symptoms that track their cycle almost precisely. Your gut has hormone receptors too.\n\nSo if your \"random\" flares aren’t random at all — you’re not imagining the pattern. You’re reading it correctly.\n\nComment 🌙 if your gut tracks your cycle 👇 Follow @sattvaibs for the full picture. 🌿",
+        hashtags:"#IBS #GutHealth #Hormones #WomensHealth #GutHealing #IBSLife #MenstrualHealth #DigestiveHealth" },
+
+      { id:24, phase:"1b", title:"Loneliness damages your gut the way bad food does",
+        hook:"The quality of your relationships might be shaping your gut health as much as what you eat.", subline:"",
+        beat1Label:"Not just food", beat1:"Every gut health conversation is about food. Isolation and chronic loneliness are among the strongest drivers of gut dysfunction — and almost nobody talks about this.", beat1Subtext:"",
+        beat2Label:"Social connection", beat2:"Social connection directly regulates the vagus nerve, which governs gut motility and repair. Loneliness elevates cortisol chronically — which alters gut bacteria and increases intestinal permeability.", beat2Subtext:"",
+        beat3Label:"Isolation alone", beat3:"In controlled models, isolation alone produces measurable gut dysbiosis — without any dietary change.", beat3Subtext:"",
+        beat4Label:"Tag someone", beat4:"Tag someone you’d want by your side on a bad gut day. Follow @sattvaibs. We look at gut health as a whole system.", beat4Subtext:"",
+        caption:"Your relationships might be shaping your gut as much as your meals are. Stay with me on this one.\n\nConnection regulates your vagus nerve — the one that governs gut motility and repair. Chronic loneliness keeps cortisol high, which alters your gut bacteria and your gut lining. In studies, isolation alone produces measurable gut dysbiosis with zero change in diet.\n\nGut health was never just about food. It’s a whole-system thing.\n\nTag someone you’d want by your side on a bad gut day 👇 Follow @sattvaibs. 🌿",
+        hashtags:"#IBS #GutHealth #VagusNerve #MentalHealth #GutBrainAxis #GutHealing #IBSLife #DigestiveHealth" },
+
+      { id:25, phase:"1b", title:"Gut healing is not a straight line",
+        hook:"You felt better for two weeks. Then crashed again. You’re not failing — this is what gut healing actually looks like.", subline:"",
+        beat1Label:"Nobody prepares you", beat1:"Most gut health content implies a clean arc: do the right things, feel better, done. Nobody prepares you for the fluctuations, the setbacks, or the days when nothing makes sense.", beat1Subtext:"",
+        beat2Label:"Waves, not a line", beat2:"Gut healing is non-linear. The microbiome shifts in waves. Die-off reactions, re-exposure flares, and adaptation periods are part of recovery.", beat2Subtext:"",
+        beat3Label:"Dips are normal", beat3:"Gut bacteria composition fluctuates significantly during healing protocols before stabilising at a healthier baseline. The dips are part of the process, not signs of failure.", beat3Subtext:"",
+        beat4Label:"Save this", beat4:"Save this for the day you want to quit, and follow @sattvaibs. Understanding this keeps you going when it matters most.", beat4Subtext:"",
+        caption:"Two good weeks. Then a crash out of nowhere. You think you’ve failed. You haven’t — this is the actual shape of healing.\n\nGut healing is non-linear. Your microbiome shifts in waves: die-off reactions, re-exposure flares, adaptation periods. The bacteria fluctuate before they settle at a healthier baseline.\n\nThe dips aren’t signs you’re doing it wrong. Expecting a straight line does more damage than the setbacks ever do.\n\nSave this for the day you want to quit 👇 Follow @sattvaibs — so you don’t give up right before it works. 🌿",
+        hashtags:"#IBS #GutHealth #GutHealing #Microbiome #IBSLife #HealingJourney #DigestiveHealth #IBSSupport" },
+
+      { id:26, phase:"1b", title:"The stricter your elimination diet, the more sensitive your gut gets",
+        hook:"The stricter your elimination diet, the more foods your gut reacts to. There’s a reason for that.", subline:"",
+        beat1Label:"Shrinking list", beat1:"Many people remove one food, then another, then another — until they’re surviving on five ingredients and still flaring. This is a documented, predictable pattern.", beat1Subtext:"",
+        beat2Label:"More sensitive, not less", beat2:"Prolonged elimination reduces microbiome diversity and trains your immune system to respond to more triggers over time — not fewer. The goal is tolerance, not permanent avoidance.", beat2Subtext:"",
+        beat3Label:"Diversity drops", beat3:"Elimination without reintroduction worsens immunological food responses over time. Microbiome diversity drops measurably within weeks of strict restriction.", beat3Subtext:"",
+        beat4Label:"Save this", beat4:"Save this if your safe-food list keeps shrinking, and follow @sattvaibs. We’ll show you how to rebuild tolerance, not just avoid triggers.", beat4Subtext:"",
+        caption:"Cut one food. Then another. Then another. Until you’re living on five ingredients — and still flaring. Sound familiar?\n\nHere’s the cruel twist: prolonged elimination lowers your microbiome diversity and actually trains your immune system to react to more foods over time, not fewer. Your gut gets more sensitive, not less.\n\nThe goal was never permanent avoidance. It’s rebuilding tolerance.\n\nSave this if your safe-food list keeps shrinking 👇 Follow @sattvaibs — we’ll show you how to widen it again. 🌿",
+        hashtags:"#IBS #GutHealth #EliminationDiet #GutHealing #Microbiome #IBSLife #FoodFreedom #DigestiveHealth" },
+
+      { id:27, phase:"1b", title:"You can’t supplement your way out of a gut problem",
+        hook:"The supplement stack isn’t working. And adding more supplements is not the answer.", subline:"",
+        beat1Label:"$50B industry", beat1:"Gut health supplements are a $50 billion industry. Probiotics, enzymes, L-glutamine, zinc — all sold as solutions. But supplements address symptoms, not systems.", beat1Subtext:"",
+        beat2Label:"Root unchanged", beat2:"If the conditions that created gut dysfunction haven’t changed — stress, sleep, dietary patterns — supplements hold the status quo at best. At worst, they mask signals you need to hear.", beat2Subtext:"",
+        beat3Label:"No improvement", beat3:"In IBS patients without personalisation, multi-supplement protocols showed no significant improvement over placebo. Context and targeting are everything.", beat3Subtext:"",
+        beat4Label:"Save this", beat4:"Save this before your next supplement order, and follow @sattvaibs. For what actually moves the needle.", beat4Subtext:"",
+        caption:"Your supplement drawer looks like a pharmacy. Your gut still isn’t right. Adding a sixth bottle won’t change that.\n\nProbiotics, enzymes, L-glutamine, zinc — real compounds, $50 billion industry. But supplements treat symptoms, not systems. If your stress, sleep and eating patterns haven’t changed, they’re holding the line at best.\n\nA 2023 review found that without personalisation, multi-supplement protocols beat placebo by… nothing. Context is everything.\n\nSave this before your next iHerb cart 👇 Follow @sattvaibs for what actually moves the needle. 🌿",
+        hashtags:"#IBS #GutHealth #Supplements #Probiotics #GutHealing #IBSLife #DigestiveHealth #GutHealthTips" },
+
+      { id:28, phase:"1b", title:"Your skin is a mirror of your gut",
+        hook:"Your eczema, acne, or rosacea might be starting in your gut — not your skin.", subline:"",
+        beat1Label:"Treated topically", beat1:"Skin conditions are treated topically. Creams, prescriptions, facewash. But if your gut is inflamed, your skin will keep reflecting it — regardless of what you put on it.", beat1Subtext:"",
+        beat2Label:"Gut-skin axis", beat2:"Gut dysbiosis triggers systemic inflammation that surfaces in the skin. The gut-skin axis is now well documented — and it runs in both directions.", beat2Subtext:"",
+        beat3Label:"Higher skin rates", beat3:"People with IBS have significantly higher rates of eczema, psoriasis, and rosacea. Improving gut health reduces inflammatory skin markers — often before topical treatments do.", beat3Subtext:"",
+        beat4Label:"Save this", beat4:"Save this if your skin and gut flare together, and follow @sattvaibs. Start from the inside.", beat4Subtext:"",
+        caption:"You’ve tried every cream, serum and prescription for your skin. What if the problem was never your skin?\n\nThe gut-skin axis is well documented now, and it runs both ways. Gut dysbiosis drives systemic inflammation that surfaces as eczema, acne, rosacea. People with IBS have significantly higher rates of all three.\n\nImproving gut health lowers inflammatory skin markers — often before topicals do anything. Sometimes you treat the face by treating the gut.\n\nSave this if your skin and gut flare together 👇 Follow @sattvaibs. Start from the inside. 🌿",
+        hashtags:"#IBS #GutHealth #GutSkinAxis #Skincare #Eczema #GutHealing #IBSLife #DigestiveHealth" },
+
+      { id:29, phase:"1b", title:"Low energy that won’t shift? Your gut might be the reason.",
+        hook:"You sleep enough. You eat well. You’re still exhausted. This might be your gut.", subline:"",
+        beat1Label:"Rarely investigated", beat1:"Chronic fatigue is one of the most common symptoms in people with gut dysfunction — and one of the least investigated. Doctors check thyroid, iron, sleep. The gut rarely gets asked.", beat1Subtext:"",
+        beat2Label:"Gut powers energy", beat2:"Your gut produces key B vitamins, metabolises iron, and regulates systemic inflammation. A dysbiotic gut can undermine your energy at the root level.", beat2Subtext:"",
+        beat3Label:"51% report fatigue", beat3:"51% of IBS patients report chronic fatigue as a primary symptom. Microbiome restoration is associated with significant energy improvement in multiple clinical trials.", beat3Subtext:"",
+        beat4Label:"Tag someone", beat4:"Tag someone who’s \"tired all the time\", and follow @sattvaibs. Gut knowledge with real impact on how you feel.", beat4Subtext:"",
+        caption:"You sleep enough. You eat well. You’re still running on empty. Before you blame yourself — check your gut.\n\nChronic fatigue is one of the most common symptoms of gut dysfunction and one of the least investigated. Your gut makes B vitamins, metabolises iron and controls inflammation — all of which power your energy. 51% of people with IBS name fatigue as a primary symptom.\n\nDoctors check thyroid, iron, sleep. The gut rarely gets asked. Maybe it should.\n\nTag someone who’s \"tired all the time\" 👇 Follow @sattvaibs. 🌿",
+        hashtags:"#IBS #GutHealth #Fatigue #Energy #GutHealing #Microbiome #IBSLife #DigestiveHealth" },
+
+      { id:30, phase:"1b", title:"Your gut is ageing faster than the rest of you",
+        hook:"Your gut microbiome starts losing diversity from your 30s. Most people don’t find out until the symptoms are already there.", subline:"",
+        beat1Label:"Crisis not prevention", beat1:"Gut health is treated as a crisis to manage, not a system to protect. Like muscle and bone density, the microbiome requires active maintenance — not just reactive care.", beat1Subtext:"",
+        beat2Label:"Biological ageing", beat2:"Microbiome diversity is a measurable marker of biological ageing. The gut bacteria of centenarians looks dramatically different from the average 70-year-old. What you do now compounds over decades.", beat2Subtext:"",
+        beat3Label:"Drops after 30", beat3:"Microbiome diversity begins measurable decline after 30 without active intervention. Higher diversity in later life correlates with lower rates of chronic disease across every category studied.", beat3Subtext:"",
+        beat4Label:"Save this", beat4:"Save this as your long-game reminder, and follow @sattvaibs. Start protecting your gut now.", beat4Subtext:"",
+        caption:"Your gut microbiome starts losing diversity in your 30s. Most people only find out once the symptoms have already arrived.\n\nDiversity is a measurable marker of biological ageing — the gut of a centenarian looks nothing like the average 70-year-old’s. And it declines after 30 unless you actively protect it. Like muscle. Like bone.\n\nHigher diversity later in life tracks with lower rates of chronic disease across every category studied. What you do now compounds for decades.\n\nSave this as your long-game reminder 👇 Follow @sattvaibs. Protect it now. 🌿",
+        hashtags:"#IBS #GutHealth #Microbiome #Longevity #GutHealing #Ageing #IBSLife #DigestiveHealth" }
+    ];
+
+    const fields = {
+      hook: document.getElementById("hook"),
+      hookColor: document.getElementById("hookColor"),
+      hookAlign: document.getElementById("hookAlign"),
+      subline: document.getElementById("subline"),
+      beat1Label: document.getElementById("beat1Label"),
+      beat1: document.getElementById("beat1"),
+      beat1Color: document.getElementById("beat1Color"),
+      beat1Align: document.getElementById("beat1Align"),
+      beat1Subtext: document.getElementById("beat1Subtext"),
+      beat2Label: document.getElementById("beat2Label"),
+      beat2: document.getElementById("beat2"),
+      beat2Color: document.getElementById("beat2Color"),
+      beat2Align: document.getElementById("beat2Align"),
+      beat2Subtext: document.getElementById("beat2Subtext"),
+      beat3Label: document.getElementById("beat3Label"),
+      beat3: document.getElementById("beat3"),
+      beat3Color: document.getElementById("beat3Color"),
+      beat3Align: document.getElementById("beat3Align"),
+      beat3Subtext: document.getElementById("beat3Subtext"),
+      ctaLabel: document.getElementById("ctaLabel"),
+      cta: document.getElementById("cta"),
+      ctaColor: document.getElementById("ctaColor"),
+      ctaAlign: document.getElementById("ctaAlign"),
+      ctaSubtext: document.getElementById("ctaSubtext"),
+      handle: document.getElementById("handle"),
+      imageFit: document.getElementById("imageFit"),
+      textSpeed: document.getElementById("textSpeed"),
+      textAnimation: document.getElementById("textAnimation"),
+      overlayStrength: document.getElementById("overlayStrength"),
+      headlineFont: document.getElementById("headlineFont"),
+      bodyFont: document.getElementById("bodyFont"),
+      rawContent: document.getElementById("rawContent"),
+      aiResponse: document.getElementById("aiResponse"),
+      imagePromptHook: document.getElementById("imagePromptHook"),
+      imagePromptBeat1: document.getElementById("imagePromptBeat1"),
+      imagePromptBeat2: document.getElementById("imagePromptBeat2"),
+      imagePromptBeat3: document.getElementById("imagePromptBeat3"),
+      imagePromptBeat4: document.getElementById("imagePromptBeat4"),
+      caption: document.getElementById("caption"),
+      hashtags: document.getElementById("hashtags"),
+      durationLabel: document.getElementById("durationLabel"),
+      previewDuration: document.getElementById("previewDuration")
+    };
+
+    const imageState = {
+      hero: null,
+      beat1: null,
+      beat2: null,
+      beat3: null,
+      beat4: null,
+      logo: null
+    };
+
+    let loopStart = performance.now();
+    let exportMode = false;
+
+    const COLORS = {
+      earth: "#67523b",
+      earthDark: "#352a1f",
+      sage: "#7fa36f",
+      sageDark: "#2f6f4d",
+      cream: "#f6efe5",
+      paper: "#e7d4bf",
+      ink: "#3b3a31",
+      white: "#fffaf2"
+    };
+
+    let scenes = [
+      { key: "hook", start: 0, end: 3200 },
+      { key: "beat1", start: 3200, end: 5200 },
+      { key: "beat2", start: 5200, end: 7200 },
+      { key: "beat3", start: 7200, end: 9200 },
+      { key: "beat4", start: 9200, end: 11000 }
+    ];
+
+    // ── Font helpers ──────────────────────────────────────
+    function headlineFontFamily() {
+      return fields.headlineFont ? fields.headlineFont.value : "Georgia, serif";
+    }
+
+    function bodyFontFamily() {
+      return fields.bodyFont ? fields.bodyFont.value : "Menlo, Monaco, Consolas, monospace";
+    }
+
+    // ── Speed ─────────────────────────────────────────────
+    function currentSpeed() {
+      const cps = parseInt(fields.textSpeed.value, 10) || 24;
+      return { cps: Math.max(4, cps) };
+    }
+
+    function typingDurationMs(text) {
+      const chars = String(text || "").length;
+      return Math.max(520, Math.ceil(chars / currentSpeed().cps * 1000));
+    }
+
+    function revealDurationMs(text) {
+      if (fields.textAnimation.value === "popup") return 850;
+      return typingDurationMs(text);
+    }
+
+    // Returns 0 if text is empty so no time is wasted on blank fields
+    function nonEmptyRevealMs(text) {
+      return String(text || "").trim() ? revealDurationMs(text) : 0;
+    }
+
+    // ── Timeline ──────────────────────────────────────────
+    function updateTimeline() {
+      const isPopup = fields.textAnimation.value === "popup";
+      if (isPopup) {
+        DURATION = 15000;
+        scenes = [
+          { key: "hook", start: 0, end: 3400 },
+          { key: "beat1", start: 3400, end: 6300 },
+          { key: "beat2", start: 6300, end: 9200 },
+          { key: "beat3", start: 9200, end: 12100 },
+          { key: "beat4", start: 12100, end: 15000 }
+        ];
+        fields.durationLabel.textContent = "15.0";
+        fields.previewDuration.textContent = "15.0";
+        return;
+      }
+
+      const hookGap = 360;
+      const beatGap = 280;
+      const hookTail = 760;
+      const beatTail = 760;
+      const ctaTail = 760;
+
+      const sublineTyping = nonEmptyRevealMs(fields.subline.value);
+
+      function beatTiming(hookField, subtextField) {
+        const hookMs = revealDurationMs(hookField.value);
+        const subMs = subtextField.value.trim() ? beatGap + nonEmptyRevealMs(subtextField.value) : 0;
+        return hookMs + subMs;
+      }
+
+      const beat1Typing = beatTiming(fields.beat1, fields.beat1Subtext);
+      const beat2Typing = beatTiming(fields.beat2, fields.beat2Subtext);
+      const beat3Typing = beatTiming(fields.beat3, fields.beat3Subtext);
+      const beat4Typing = beatTiming(fields.cta, fields.ctaSubtext);
+
+      const hookSubGap = sublineTyping > 0 ? hookGap : 0;
+
+      const durations = {
+        hook: Math.max(3200, 420 + revealDurationMs(fields.hook.value) + hookSubGap + sublineTyping + hookTail),
+        beat1: Math.max(1800, 320 + beat1Typing + beatTail),
+        beat2: Math.max(1800, 320 + beat2Typing + beatTail),
+        beat3: Math.max(1800, 320 + beat3Typing + beatTail),
+        beat4: Math.max(1800, 320 + beat4Typing + ctaTail)
+      };
+
+      let cursor = 0;
+      scenes = ["hook", "beat1", "beat2", "beat3", "beat4"].map((key) => {
+        const start = cursor;
+        cursor += durations[key];
+        return { key, start, end: cursor };
+      });
+      DURATION = cursor;
+
+      const seconds = (DURATION / 1000).toFixed(1);
+      fields.durationLabel.textContent = seconds;
+      fields.previewDuration.textContent = seconds;
+    }
+
+    // ── Image slots ───────────────────────────────────────
+    const SLOT_KEYS = ["hero", "beat1", "beat2", "beat3", "beat4"];
+    const SLOT_LABELS = ["Hook", "Beat 1", "Beat 2", "Beat 3", "Beat 4"];
+    let dragSrcKey = null;
+
+    function loadImageFile(file, key, callback) {
+      const reader = new FileReader();
+      reader.onload = () => {
+        const img = new Image();
+        img.onload = () => {
+          imageState[key] = img;
+          if (callback) callback();
+        };
+        img.src = reader.result;
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function renderSlots() {
+      const container = document.getElementById("imageSlots");
+      container.innerHTML = "";
+
+      SLOT_KEYS.forEach((key, index) => {
+        const slot = document.createElement("div");
+        slot.className = "img-slot" + (imageState[key] ? " has-image" : "");
+        slot.draggable = true;
+        slot.dataset.key = key;
+
+        const lbl = document.createElement("div");
+        lbl.className = "img-slot-label";
+        lbl.textContent = SLOT_LABELS[index];
+
+        const preview = document.createElement("div");
+        preview.className = "img-slot-preview";
+        preview.title = "Click to replace";
+
+        if (imageState[key]) {
+          const img = document.createElement("img");
+          img.src = imageState[key].src;
+          img.alt = SLOT_LABELS[index];
+          preview.appendChild(img);
+        } else {
+          const ph = document.createElement("span");
+          ph.className = "img-slot-placeholder";
+          ph.textContent = "+";
+          preview.appendChild(ph);
+        }
+
+        const input = document.createElement("input");
+        input.type = "file";
+        input.accept = "image/*";
+        input.style.display = "none";
+        input.addEventListener("change", () => {
+          const file = input.files && input.files[0];
+          if (!file) return;
+          loadImageFile(file, key, renderSlots);
+          input.value = "";
+        });
+
+        preview.addEventListener("click", () => input.click());
+
+        const clearBtn = document.createElement("button");
+        clearBtn.className = "img-slot-clear";
+        clearBtn.textContent = "✕";
+        clearBtn.type = "button";
+        clearBtn.title = "Remove image";
+        clearBtn.addEventListener("click", (e) => {
+          e.stopPropagation();
+          imageState[key] = null;
+          renderSlots();
+        });
+
+        // Drag-and-drop reorder
+        slot.addEventListener("dragstart", (e) => {
+          dragSrcKey = key;
+          e.dataTransfer.effectAllowed = "move";
+          slot.classList.add("dragging");
+        });
+        slot.addEventListener("dragend", () => {
+          slot.classList.remove("dragging");
+          document.querySelectorAll(".img-slot").forEach(s => s.classList.remove("drag-over"));
+          dragSrcKey = null;
+        });
+        slot.addEventListener("dragover", (e) => {
+          e.preventDefault();
+          e.dataTransfer.dropEffect = "move";
+          slot.classList.add("drag-over");
+        });
+        slot.addEventListener("dragleave", () => {
+          slot.classList.remove("drag-over");
+        });
+        slot.addEventListener("drop", (e) => {
+          e.preventDefault();
+          slot.classList.remove("drag-over");
+          if (dragSrcKey && dragSrcKey !== key) {
+            const temp = imageState[dragSrcKey];
+            imageState[dragSrcKey] = imageState[key];
+            imageState[key] = temp;
+            renderSlots();
+          }
+        });
+
+        slot.appendChild(lbl);
+        slot.appendChild(preview);
+        slot.appendChild(input);
+        slot.appendChild(clearBtn);
+        container.appendChild(slot);
+      });
+    }
+
+    // Bulk upload — assigns files left to right
+    document.getElementById("bulkUpload").addEventListener("change", function () {
+      const files = Array.from(this.files).slice(0, 5);
+      let remaining = files.length;
+      if (!remaining) return;
+      files.forEach((file, index) => {
+        loadImageFile(file, SLOT_KEYS[index], () => {
+          remaining--;
+          if (remaining === 0) renderSlots();
+        });
+      });
+      this.value = "";
+    });
+
+    // Logo upload
+    document.getElementById("logoImage").addEventListener("change", function () {
+      const file = this.files && this.files[0];
+      if (!file) return;
+      loadImageFile(file, "logo", null);
+      this.value = "";
+    });
+
+    // Initial render
+    renderSlots();
+
+    // ── Content Library picker ────────────────────────────
+    function populateLibPost() {
+      const phase = document.getElementById("libPhase").value;
+      const postSelect = document.getElementById("libPost");
+      postSelect.innerHTML = "";
+      CONTENT_LIBRARY.filter(p => p.phase === phase).forEach(p => {
+        const opt = document.createElement("option");
+        opt.value = p.id;
+        opt.textContent = p.id + " — " + p.title;
+        postSelect.appendChild(opt);
+      });
+    }
+
+    document.getElementById("libPhase").addEventListener("change", populateLibPost);
+
+    document.getElementById("libLoad").addEventListener("click", () => {
+      const id = parseInt(document.getElementById("libPost").value, 10);
+      const post = CONTENT_LIBRARY.find(p => p.id === id);
+      const status = document.getElementById("libStatus");
+      if (!post) { status.textContent = "Post not found."; return; }
+      fields.hook.value        = post.hook;
+      fields.subline.value     = post.subline;
+      fields.beat1Label.value  = post.beat1Label;
+      fields.beat1.value       = post.beat1;
+      fields.beat1Subtext.value= post.beat1Subtext;
+      fields.beat2Label.value  = post.beat2Label;
+      fields.beat2.value       = post.beat2;
+      fields.beat2Subtext.value= post.beat2Subtext;
+      fields.beat3Label.value  = post.beat3Label;
+      fields.beat3.value       = post.beat3;
+      fields.beat3Subtext.value= post.beat3Subtext;
+      fields.ctaLabel.value    = post.beat4Label;
+      fields.cta.value         = post.beat4;
+      fields.ctaSubtext.value  = post.beat4Subtext;
+      fields.caption.value     = post.caption;
+      fields.hashtags.value    = post.hashtags;
+      updateTimeline();
+      status.textContent = "✓ Loaded: " + post.title;
+    });
+
+    populateLibPost();
+
+    // ── Tab navigation ────────────────────────────────────
+    const TAB_LABELS = { library:"Library", images:"Images", copy:"Reel Copy", style:"Style", ai:"AI Helper", preview:"Preview" };
+    const tabBtns = document.querySelectorAll(".tab-btn");
+    const tabPanels = document.querySelectorAll(".tab-panel");
+    const currentLabel = document.getElementById("currentSectionLabel");
+    function activateTab(name) {
+      tabBtns.forEach(b => {
+        const on = b.dataset.tab === name;
+        b.classList.toggle("is-active", on);
+        b.setAttribute("aria-selected", on ? "true" : "false");
+      });
+      tabPanels.forEach(p => p.classList.toggle("is-active", p.dataset.tab === name));
+      if (currentLabel) currentLabel.textContent = TAB_LABELS[name] || "";
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+    tabBtns.forEach(b => b.addEventListener("click", () => activateTab(b.dataset.tab)));
+    document.querySelectorAll(".hint-jump").forEach(b => {
+      b.addEventListener("click", () => activateTab(b.dataset.jumpTab));
+    });
+
+    // ── Speed slider display ───────────────────────────────
+    fields.textSpeed.addEventListener("input", () => {
+      document.getElementById("speedValue").textContent = fields.textSpeed.value + " chars/sec";
+      updateTimeline();
+    });
+
+    // ── Timeline listeners ────────────────────────────────
+    ["hook", "subline", "beat1Label", "beat1", "beat1Subtext", "beat2Label", "beat2", "beat2Subtext",
+     "beat3Label", "beat3", "beat3Subtext", "ctaLabel", "cta", "ctaSubtext", "textAnimation"].forEach((key) => {
+      fields[key].addEventListener("input", updateTimeline);
+      fields[key].addEventListener("change", updateTimeline);
+    });
+    updateTimeline();
+
+    // ── Canvas helpers ────────────────────────────────────
+    function clamp(value, min, max) {
+      return Math.max(min, Math.min(max, value));
+    }
+
+    function easeOutCubic(x) {
+      return 1 - Math.pow(1 - clamp(x, 0, 1), 3);
+    }
+
+    function easeInOut(x) {
+      x = clamp(x, 0, 1);
+      return x < 0.5 ? 2 * x * x : 1 - Math.pow(-2 * x + 2, 2) / 2;
+    }
+
+    function getScene(ms) {
+      return scenes.find((scene) => ms >= scene.start && ms < scene.end) || scenes[scenes.length - 1];
+    }
+
+    function sceneProgress(scene, ms) {
+      return clamp((ms - scene.start) / (scene.end - scene.start), 0, 1);
+    }
+
+    function selectedImage(sceneKey) {
+      if (sceneKey === "beat1") return imageState.beat1 || imageState.hero;
+      if (sceneKey === "beat2") return imageState.beat2 || imageState.hero;
+      if (sceneKey === "beat3") return imageState.beat3 || imageState.hero;
+      if (sceneKey === "beat4") return imageState.beat4 || imageState.hero;
+      return imageState.hero;
+    }
+
+    function drawImageFill(img, sceneKey, progress) {
+      const fit = fields.imageFit.value;
+      if (!img) {
+        drawBotanicalBackground(progress);
+        return;
+      }
+
+      const imgRatio = img.width / img.height;
+      const canvasRatio = W / H;
+      let dw, dh;
+
+      if (fit === "contain") {
+        if (imgRatio > canvasRatio) { dw = W; dh = W / imgRatio; }
+        else { dh = H; dw = H * imgRatio; }
+      } else if (imgRatio > canvasRatio) {
+        dh = H; dw = H * imgRatio;
+      } else {
+        dw = W; dh = W / imgRatio;
+      }
+
+      const zoom = 1 + progress * 0.045;
+      dw *= zoom;
+      dh *= zoom;
+
+      const pan = { hook: -22, beat1: 18, beat2: -10, beat3: 14, cta: 0 }[sceneKey] || 0;
+      const dx = (W - dw) / 2 + pan * easeInOut(progress);
+      const dy = (H - dh) / 2 - 24 * easeInOut(progress);
+
+      ctx.save();
+      ctx.fillStyle = COLORS.earth;
+      ctx.fillRect(0, 0, W, H);
+      ctx.drawImage(img, dx, dy, dw, dh);
+      ctx.restore();
+    }
+
+    function drawBotanicalBackground(progress) {
+      const gradient = ctx.createLinearGradient(0, 0, W, H);
+      gradient.addColorStop(0, "#e4c8a8");
+      gradient.addColorStop(0.48, "#a6b98d");
+      gradient.addColorStop(1, "#66513a");
+      ctx.fillStyle = gradient;
+      ctx.fillRect(0, 0, W, H);
+
+      ctx.save();
+      ctx.globalAlpha = 0.18;
+      ctx.strokeStyle = "#2f6f4d";
+      ctx.lineWidth = 8;
+      for (let i = 0; i < 18; i += 1) {
+        const x = ((i * 173 + progress * 90) % (W + 240)) - 120;
+        const y = (i * 211) % H;
+        drawLeafStem(x, y, 120 + (i % 3) * 40, i % 2 ? -0.7 : 0.7);
+      }
+      ctx.restore();
+    }
+
+    function drawLeafStem(x, y, length, dir) {
+      ctx.beginPath();
+      ctx.moveTo(x, y);
+      ctx.quadraticCurveTo(x + 45 * dir, y - length * 0.45, x + 16 * dir, y - length);
+      ctx.stroke();
+      for (let i = 0; i < 5; i += 1) {
+        const yy = y - 20 - i * 22;
+        const xx = x + i * 4 * dir;
+        ctx.beginPath();
+        ctx.ellipse(xx + 26 * dir, yy, 28, 10, dir * -0.75, 0, Math.PI * 2);
+        ctx.fillStyle = "#2f6f4d";
+        ctx.fill();
+      }
+    }
+
+    function drawOverlays(sceneKey, progress) {
+      const strength = {
+        medium: { bottom: 0.84, scene: 0.52 },
+        strong: { bottom: 0.9, scene: 0.62 },
+        extra: { bottom: 0.94, scene: 0.72 }
+      }[fields.overlayStrength.value] || { bottom: 0.9, scene: 0.62 };
+
+      const top = ctx.createLinearGradient(0, 0, 0, H);
+      top.addColorStop(0, "rgba(53,42,31,0.28)");
+      top.addColorStop(0.36, "rgba(53,42,31,0.18)");
+      top.addColorStop(0.64, "rgba(53,42,31,0.46)");
+      top.addColorStop(1, "rgba(53,42,31," + strength.bottom + ")");
+      ctx.fillStyle = top;
+      ctx.fillRect(0, 0, W, H);
+
+      if (sceneKey !== "hook") {
+        ctx.fillStyle = "rgba(53,42,31," + strength.scene + ")";
+        ctx.fillRect(0, 0, W, H);
+      }
+
+      ctx.save();
+      ctx.globalAlpha = 0.16;
+      ctx.fillStyle = COLORS.paper;
+      ctx.beginPath();
+      ctx.arc(W - 90, 170, 250 + progress * 18, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.restore();
+    }
+
+    function drawBrand() {
+      if (imageState.logo) { drawLogoImage(); return; }
+      ctx.save();
+      ctx.translate(76, H - 118);
+      ctx.globalAlpha = 0.58;
+      ctx.shadowColor = "rgba(53,42,31,0.18)";
+      ctx.shadowBlur = 8;
+      ctx.shadowOffsetY = 2;
+      drawSiteLeaf(0, -28, 48, "#9fca8b");
+      ctx.fillStyle = "#2f6f4d";
+      ctx.font = "700 44px Georgia, serif";
+      ctx.textBaseline = "middle";
+      ctx.textAlign = "left";
+      ctx.fillText("Sattva", 60, 0);
+      ctx.restore();
+    }
+
+    function drawSiteLeaf(x, y, size, color) {
+      const s = size / 24;
+      ctx.save();
+      ctx.translate(x, y);
+      ctx.scale(s, s);
+      ctx.strokeStyle = color;
+      ctx.lineWidth = 2.2;
+      ctx.lineCap = "round";
+      ctx.lineJoin = "round";
+      ctx.fillStyle = "rgba(159,202,139,0.16)";
+      ctx.beginPath();
+      ctx.moveTo(11, 20);
+      ctx.bezierCurveTo(6.8, 20, 4, 17.1, 4, 13.1);
+      ctx.bezierCurveTo(4, 8.8, 7.1, 6.5, 11.2, 5.9);
+      ctx.bezierCurveTo(15.4, 5.3, 17.4, 3.7, 20, 2);
+      ctx.bezierCurveTo(21, 4.4, 22, 7, 22, 10.5);
+      ctx.bezierCurveTo(22, 16, 17.7, 20, 11, 20);
+      ctx.closePath();
+      ctx.fill();
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.moveTo(2, 21);
+      ctx.bezierCurveTo(4.8, 17.4, 8.6, 15.2, 13, 12);
+      ctx.stroke();
+      ctx.restore();
+    }
+
+    function drawLogoImage() {
+      const img = imageState.logo;
+      const maxW = 250, maxH = 92;
+      const ratio = img.width / img.height;
+      let dw = maxW, dh = dw / ratio;
+      if (dh > maxH) { dh = maxH; dw = dh * ratio; }
+      ctx.save();
+      ctx.globalAlpha = 0.96;
+      ctx.drawImage(img, 76, H - 172, dw, dh);
+      ctx.restore();
+    }
+
+    function drawSattvaFrame() {
+      ctx.save();
+      ctx.strokeStyle = "rgba(246,239,229,0.46)";
+      ctx.lineWidth = 3;
+      ctx.strokeRect(36, 36, W - 72, H - 72);
+      ctx.restore();
+    }
+
+    function wrapText(text, maxWidth, font, maxLines) {
+      ctx.font = font;
+      const rawWords = String(text || "").trim().split(/\s+/).filter(Boolean);
+      const words = [];
+      rawWords.forEach((word) => {
+        if (ctx.measureText(word).width <= maxWidth) { words.push(word); return; }
+        let chunk = "";
+        Array.from(word).forEach((char) => {
+          const test = chunk + char;
+          if (ctx.measureText(test).width <= maxWidth || !chunk) { chunk = test; }
+          else { words.push(chunk); chunk = char; }
+        });
+        if (chunk) words.push(chunk);
+      });
+      const lines = [];
+      let line = "";
+      for (const word of words) {
+        const test = line ? line + " " + word : word;
+        if (ctx.measureText(test).width <= maxWidth || !line) { line = test; }
+        else { lines.push(line); line = word; }
+      }
+      if (line) lines.push(line);
+      return maxLines ? lines.slice(0, maxLines) : lines;
+    }
+
+    function sharedControlName(fieldName) {
+      const pairs = { subline: "hook", beat1Subtext: "beat1", beat2Subtext: "beat2", beat3Subtext: "beat3", ctaSubtext: "cta" };
+      return pairs[fieldName] || fieldName;
+    }
+
+    function textAlignFor(fieldName, fallback) {
+      const select = fields[sharedControlName(fieldName) + "Align"];
+      return select ? select.value : fallback;
+    }
+
+    function fitFont(text, baseSize, minSize, maxWidth, fontFamily, maxLines) {
+      for (let size = baseSize; size >= minSize; size -= 2) {
+        const font = "700 " + size + "px " + fontFamily;
+        const lines = wrapText(text, maxWidth, font, maxLines);
+        const tooWide = lines.some((line) => ctx.measureText(line).width > maxWidth);
+        if (!tooWide && lines.length <= maxLines) return { size, font, lines };
+      }
+      const font = "700 " + minSize + "px " + fontFamily;
+      return { size: minSize, font, lines: wrapText(text, maxWidth, font, maxLines) };
+    }
+
+    function typeTextTimed(text, elapsedMs, startMs) {
+      const normalized = String(text || "");
+      if (fields.textAnimation.value === "popup") return elapsedMs >= startMs ? normalized : "";
+      const elapsedTypingMs = Math.max(0, elapsedMs - startMs);
+      const count = Math.ceil(elapsedTypingMs / 1000 * currentSpeed().cps);
+      return normalized.slice(0, count);
+    }
+
+    function textReveal(progressMs, startMs) {
+      if (fields.textAnimation.value !== "popup") return { alpha: 1, scale: 1, y: 0 };
+      const p = clamp((progressMs - startMs) / 900, 0, 1);
+      const eased = easeOutCubic(p);
+      return { alpha: eased, scale: 0.92 + eased * 0.08, y: 26 * (1 - eased) };
+    }
+
+    function selectedTextColor(alpha, fieldName) {
+      const select = fields[sharedControlName(fieldName) + "Color"];
+      const colorKey = select ? select.value : "white";
+      const colors = {
+        white: "rgba(246,239,229," + alpha + ")",
+        green: "rgba(127,163,111," + alpha + ")",
+        brown: "rgba(53,42,31," + alpha + ")"
+      };
+      return colors[colorKey] || colors.white;
+    }
+
+    function textShadowColor(fieldName) {
+      const select = fields[sharedControlName(fieldName) + "Color"];
+      const colorKey = select ? select.value : "white";
+      return colorKey === "brown" ? "rgba(246,239,229,0.58)" : "rgba(53,42,31,0.64)";
+    }
+
+    function drawTextLines(lines, x, y, lineHeight, align, maxWidth) {
+      ctx.textBaseline = "top";
+      lines.forEach((line, index) => {
+        const lineY = y + index * lineHeight;
+        if (align === "justify" && index < lines.length - 1 && line.includes(" ") && maxWidth) {
+          drawJustifiedLine(line, x, lineY, maxWidth);
+          return;
+        }
+        ctx.textAlign = align === "justify" ? "left" : align || "left";
+        ctx.fillText(line, xForAlign(x, maxWidth, align), lineY);
+      });
+    }
+
+    function xForAlign(x, maxWidth, align) {
+      if (!maxWidth) return x;
+      if (align === "center") return x + maxWidth / 2;
+      if (align === "right") return x + maxWidth;
+      return x;
+    }
+
+    function drawJustifiedLine(line, x, y, maxWidth) {
+      const words = line.trim().split(/\s+/).filter(Boolean);
+      if (words.length < 2) { ctx.textAlign = "left"; ctx.fillText(line, x, y); return; }
+      const wordsWidth = words.reduce((sum, word) => sum + ctx.measureText(word).width, 0);
+      const gap = Math.max(4, (maxWidth - wordsWidth) / (words.length - 1));
+      let cursor = x;
+      ctx.textAlign = "left";
+      words.forEach((word) => { ctx.fillText(word, cursor, y); cursor += ctx.measureText(word).width + gap; });
+    }
+
+    function drawHook(progress, elapsedMs) {
+      const hFont = headlineFontFamily();
+      const bFont = bodyFontFamily();
+      const hookStart = 420;
+      const sublineText = fields.subline.value;
+      const hasSubline = sublineText.trim().length > 0;
+      const subStart = hasSubline ? hookStart + revealDurationMs(fields.hook.value) + 360 : Infinity;
+      const hookText = typeTextTimed(fields.hook.value, elapsedMs, hookStart);
+      const subText = hasSubline ? typeTextTimed(sublineText, elapsedMs, subStart) : "";
+      const hookMaxWidth = W - 140;
+      const subMaxWidth = W - 150;
+      const hook = fitFont(hookText, 78, 38, hookMaxWidth, hFont, 5);
+      const sub = hasSubline ? fitFont(subText, 40, 24, subMaxWidth, bFont, 5) : null;
+      const hookReveal = textReveal(elapsedMs, hookStart);
+      const subReveal = hasSubline ? textReveal(elapsedMs, subStart) : { alpha: 0, scale: 1, y: 0 };
+      const hookHeight = hook.lines.length * hook.size * 1.08;
+      const subHeight = sub ? sub.lines.length * sub.size * 1.34 : 0;
+      const totalHeight = hookHeight + (hasSubline ? 54 + subHeight : 0);
+      const startY = clamp((H - totalHeight) / 2 - 90, 230, 560);
+
+      ctx.save();
+      const yOffset = 22 * (1 - easeOutCubic(progress));
+      ctx.translate(0, yOffset);
+      ctx.shadowColor = textShadowColor("hook");
+      ctx.shadowBlur = 20;
+      ctx.shadowOffsetY = 3;
+      ctx.fillStyle = selectedTextColor(0.94 * hookReveal.alpha, "hook");
+      ctx.font = hook.font;
+      ctx.save();
+      ctx.translate(72, startY + hookReveal.y);
+      ctx.scale(hookReveal.scale, hookReveal.scale);
+      drawTextLines(hook.lines, 0, 0, hook.size * 1.08, textAlignFor("hook", "left"), hookMaxWidth);
+      ctx.restore();
+
+      if (hasSubline && sub) {
+        ctx.shadowColor = textShadowColor("subline");
+        ctx.fillStyle = selectedTextColor(0.8 * subReveal.alpha, "subline");
+        ctx.font = sub.font;
+        ctx.save();
+        ctx.translate(72, startY + hookHeight + 54 + subReveal.y);
+        ctx.scale(subReveal.scale, subReveal.scale);
+        drawTextLines(sub.lines, 0, 0, sub.size * 1.34, textAlignFor("subline", "left"), subMaxWidth);
+        ctx.restore();
+      }
+      ctx.restore();
+    }
+
+    function drawBeat(progress, elapsedMs, key, label, text, subtext) {
+      const hFont = headlineFontFamily();
+      const bFont = bodyFontFamily();
+      const labelText = String(label || "").trim();
+      const hasSubtext = String(subtext || "").trim().length > 0;
+      const hookStart = 360;
+      const subStart = hasSubtext ? hookStart + revealDurationMs(text) + 280 : Infinity;
+      const typed = typeTextTimed(text, elapsedMs, hookStart);
+      const typedSubtext = hasSubtext ? typeTextTimed(subtext, elapsedMs, subStart) : "";
+      const labelMaxWidth = W - 150;
+      const hookMaxWidth = W - 150;
+      const subMaxWidth = W - 170;
+      const fittedLabel = fitFont(labelText, 94, 44, labelMaxWidth, hFont, 2);
+      const fitted = fitFont(typed, key === "beat2" ? 62 : 58, 30, hookMaxWidth, hFont, 4);
+      const fittedSubtext = hasSubtext ? fitFont(typedSubtext, 34, 20, subMaxWidth, bFont, 6) : null;
+      const reveal = easeOutCubic(progress);
+      const hookReveal = textReveal(elapsedMs, hookStart);
+      const subReveal = hasSubtext ? textReveal(elapsedMs, subStart) : { alpha: 0, scale: 1, y: 0 };
+      const labelHeight = labelText ? fittedLabel.lines.length * fittedLabel.size * 1.04 : 0;
+      const labelGap = labelText ? 76 : 0;
+      const hookHeight = fitted.lines.length * fitted.size * 1.1;
+      const subHeight = fittedSubtext ? fittedSubtext.lines.length * fittedSubtext.size * 1.34 : 0;
+      const contentHeight = labelHeight + labelGap + hookHeight + (hasSubtext ? 50 + subHeight : 0);
+      const contentTop = clamp((H - contentHeight) / 2 - 80, 250, 650);
+      const labelY = contentTop;
+      const barY = labelText ? labelY + labelHeight + 28 : contentTop;
+      const hookY = labelText ? barY + 48 : contentTop;
+      const subY = hookY + hookHeight + 50;
+
+      ctx.save();
+      ctx.translate(0, 28 * (1 - reveal));
+
+      if (labelText) {
+        ctx.shadowColor = textShadowColor(key);
+        ctx.shadowBlur = 20;
+        ctx.shadowOffsetY = 3;
+        ctx.fillStyle = selectedTextColor(0.97, key);
+        ctx.font = fittedLabel.font;
+        ctx.save();
+        ctx.translate(75, labelY);
+        drawTextLines(fittedLabel.lines, 0, 0, fittedLabel.size * 1.04, textAlignFor(key, "center"), labelMaxWidth);
+        ctx.restore();
+        ctx.fillStyle = COLORS.sage;
+        ctx.shadowBlur = 0;
+        ctx.shadowOffsetY = 0;
+        ctx.fillRect(W / 2 - 58, barY, 116, 8);
+      }
+
+      ctx.shadowColor = textShadowColor(key);
+      ctx.shadowBlur = 18;
+      ctx.shadowOffsetY = 3;
+      ctx.fillStyle = selectedTextColor(0.9 * hookReveal.alpha, key);
+      ctx.font = fitted.font;
+      ctx.save();
+      ctx.translate(75, hookY + hookReveal.y);
+      ctx.scale(hookReveal.scale, hookReveal.scale);
+      drawTextLines(fitted.lines, 0, 0, fitted.size * 1.1, textAlignFor(key, "center"), hookMaxWidth);
+      ctx.restore();
+
+      if (hasSubtext && fittedSubtext) {
+        ctx.shadowColor = textShadowColor(key + "Subtext");
+        ctx.fillStyle = selectedTextColor(0.78 * subReveal.alpha, key + "Subtext");
+        ctx.font = fittedSubtext.font;
+        ctx.save();
+        ctx.translate(85, subY + subReveal.y);
+        ctx.scale(subReveal.scale, subReveal.scale);
+        drawTextLines(fittedSubtext.lines, 0, 0, fittedSubtext.size * 1.34, textAlignFor(key + "Subtext", "center"), subMaxWidth);
+        ctx.restore();
+      }
+      ctx.restore();
+    }
+
+    function draw(ms) {
+      const scene = getScene(ms);
+      const progress = sceneProgress(scene, ms);
+      const elapsedMs = ms - scene.start;
+      const img = selectedImage(scene.key);
+
+      ctx.clearRect(0, 0, W, H);
+      drawImageFill(img, scene.key, progress);
+      drawOverlays(scene.key, progress);
+      drawSattvaFrame();
+
+      if (scene.key === "hook") {
+        drawHook(progress, elapsedMs);
+      } else if (scene.key === "beat1") {
+        drawBeat(progress, elapsedMs, "beat1", fields.beat1Label.value, fields.beat1.value, fields.beat1Subtext.value);
+      } else if (scene.key === "beat2") {
+        drawBeat(progress, elapsedMs, "beat2", fields.beat2Label.value, fields.beat2.value, fields.beat2Subtext.value);
+      } else if (scene.key === "beat3") {
+        drawBeat(progress, elapsedMs, "beat3", fields.beat3Label.value, fields.beat3.value, fields.beat3Subtext.value);
+      } else if (scene.key === "beat4") {
+        drawBeat(progress, elapsedMs, "cta", fields.ctaLabel.value, fields.cta.value, fields.ctaSubtext.value);
+      }
+      drawBrand();
+    }
+
+    function animate(now) {
+      if (!exportMode) {
+        const ms = (now - loopStart) % DURATION;
+        draw(ms);
+      }
+      requestAnimationFrame(animate);
+    }
+    requestAnimationFrame(animate);
+
+    // ── Static post export (4:5, 1080×1350) ────────────────
+    const POST_SCENES = [
+      ["hook",  "1-hook"],
+      ["beat1", "2-beat1"],
+      ["beat2", "3-beat2"],
+      ["beat3", "4-beat3"],
+      ["beat4", "5-cta"]
+    ];
+
+    // Render one scene's final, fully-typed frame to an offscreen 4:5 canvas.
+    function renderPostScene(sceneKey) {
+      const off = document.createElement("canvas");
+      off.width = 1080;
+      off.height = 1350;
+      const prevCtx = ctx, prevW = W, prevH = H;
+      ctx = off.getContext("2d");
+      W = off.width;
+      H = off.height;
+      try {
+        const img = selectedImage(sceneKey);
+        const SETTLED = 1e7; // large elapsed → full text, reveal complete
+        ctx.clearRect(0, 0, W, H);
+        drawImageFill(img, sceneKey, 1);
+        drawOverlays(sceneKey, 1);
+        drawSattvaFrame();
+        if (sceneKey === "hook") {
+          drawHook(1, SETTLED);
+        } else if (sceneKey === "beat1") {
+          drawBeat(1, SETTLED, "beat1", fields.beat1Label.value, fields.beat1.value, fields.beat1Subtext.value);
+        } else if (sceneKey === "beat2") {
+          drawBeat(1, SETTLED, "beat2", fields.beat2Label.value, fields.beat2.value, fields.beat2Subtext.value);
+        } else if (sceneKey === "beat3") {
+          drawBeat(1, SETTLED, "beat3", fields.beat3Label.value, fields.beat3.value, fields.beat3Subtext.value);
+        } else if (sceneKey === "beat4") {
+          drawBeat(1, SETTLED, "cta", fields.ctaLabel.value, fields.cta.value, fields.ctaSubtext.value);
+        }
+        drawBrand();
+      } finally {
+        ctx = prevCtx;
+        W = prevW;
+        H = prevH;
+      }
+      return off;
+    }
+
+    function canvasToBlob(cv) {
+      return new Promise((resolve) => cv.toBlob(resolve, "image/png"));
+    }
+
+    document.getElementById("downloadPosts").addEventListener("click", async (event) => {
+      const button = event.currentTarget;
+      const status = document.getElementById("postsStatus");
+      button.disabled = true;
+      const original = button.textContent;
+      try {
+        for (let i = 0; i < POST_SCENES.length; i += 1) {
+          const [key, name] = POST_SCENES[i];
+          button.textContent = "Rendering " + (i + 1) + " / " + POST_SCENES.length + "…";
+          status.textContent = "Exporting image " + (i + 1) + " of " + POST_SCENES.length + " (" + name + ")…";
+          const blob = await canvasToBlob(renderPostScene(key));
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement("a");
+          a.href = url;
+          a.download = "sattva-post-" + name + ".png";
+          document.body.appendChild(a);
+          a.click();
+          a.remove();
+          setTimeout(() => URL.revokeObjectURL(url), 4000);
+          await new Promise((r) => setTimeout(r, 400)); // let browser queue each save
+        }
+        status.textContent = "Saved 5 posts (1080×1350). If only one saved, allow multiple downloads for this site.";
+        showButtonFeedback(button, "Saved 5 posts");
+      } catch (err) {
+        status.textContent = "Post export failed: " + (err && err.message ? err.message : err);
+      } finally {
+        button.disabled = false;
+        button.textContent = original;
+      }
+    });
+
+    // ── AI Helper ─────────────────────────────────────────
+    function makePrompt() {
+      const raw = fields.rawContent.value.trim();
+      return "You are helping create a Sattva Instagram reel about Ayurveda, gut health, and IBS. This is the planning step only. Do NOT generate images in this response. " +
+        "Return ONLY a JSON object with these exact fields: hook, subline, beat1Label, beat1, beat1Subtext, beat2Label, beat2, beat2Subtext, beat3Label, beat3, beat3Subtext, beat4Label, beat4, beat4Subtext, imagePromptHook, imagePromptBeat1, imagePromptBeat2, imagePromptBeat3, imagePromptBeat4, caption, hashtags. Beat labels are optional and may be empty strings. " +
+        "Keep hook and beats concise for a social reel. The template will extend timing for longer text, but shorter is still easier to read. Use warm, clear, science-aware language. " +
+        "Avoid medical claims that sound like diagnosis or cure. Use Beat 4 as the closing mission or follow prompt. Return all hashtags in lowercase. " +
+        "For imagePromptHook, imagePromptBeat1, imagePromptBeat2, imagePromptBeat3, and imagePromptBeat4, write five separate prompts that I can copy one at a time into an image generator. Each prompt must be complete and standalone, so it works without needing the other prompts. " +
+        "Each image prompt must ask for exactly one standalone full-frame vertical 9:16 image, not a collage, contact sheet, grid, multi-panel layout, storyboard sheet, split-screen image, or any image with borders between scenes. " +
+        "The five image prompts must closely relate to the raw text and the specific beat they represent. Do not use generic wellness imagery if the raw text suggests a more specific visual idea. " +
+        "Across all five image prompts, no more than one prompt may include a human, person, face, body, hands, or any visible body part. The other four prompts must be non-human scenes using relevant objects, ingredients, herbs, food, tea, bowls, fabric, steam, botanical details, kitchen or nature textures, abstract gut-friendly metaphors, or symbolic arrangements tied to the raw text. " +
+        "Make each image prompt as eye-catching and scroll-stopping as possible while staying directly relevant to that reel section. Each image should have one strong focal subject, dramatic crop, rich texture, layered foreground/background depth, warm highlights, deep natural shadows, and a clear emotional idea tied to the reel copy. " +
+        "Use this visual direction inside every image prompt: vertical 9:16 premium editorial wellness photograph, photorealistic, cinematic natural window light, shallow depth of field, bold but earthy contrast, Ayurvedic herbs or food or calm body-awareness imagery, earth brown, sage green, cream, burgundy, turmeric gold, and soft botanical textures. Leave generous clean negative space for overlaid reel text. " +
+        "Prefer tactile close-ups, bowls, steam, herbs, fresh produce, fabric, sunlight, and ingredient-led scenes over generic stock-like wellness scenes. Avoid flat lay repetition unless the composition is unusually striking. " +
+        "Each image prompt must say: no text, captions, typography, labels, logos, watermarks, UI graphics, medical charts, scary clinical imagery, pills, needles, or before/after claims. " +
+        "The five image prompts should feel like one consistent Sattva campaign, but each should show a different subject or scene.\n\n" +
+        "Raw content:\n" + raw + "\n\nReturn only the valid JSON object. Do not generate images in this response.";
+    }
+
+    const imagePromptFields = [
+      ["Hook", "imagePromptHook"],
+      ["Beat 1", "imagePromptBeat1"],
+      ["Beat 2", "imagePromptBeat2"],
+      ["Beat 3", "imagePromptBeat3"],
+      ["Beat 4", "imagePromptBeat4"]
+    ];
+
+    function imagePromptText() {
+      return imagePromptFields
+        .map(([label, key]) => {
+          const value = fields[key].value.trim();
+          return value ? label + " Image Prompt:\n" + value : "";
+        })
+        .filter(Boolean)
+        .join("\n\n");
+    }
+
+    function showButtonFeedback(button, label) {
+      if (!button) return;
+      const original = button.dataset.originalText || button.textContent;
+      button.dataset.originalText = original;
+      button.classList.add("is-clicked", "is-done");
+      if (label) button.textContent = label;
+      window.setTimeout(() => { button.classList.remove("is-clicked"); }, 180);
+      window.setTimeout(() => {
+        button.classList.remove("is-done");
+        if (!button.disabled) button.textContent = original;
+      }, 1100);
+    }
+
+    document.getElementById("copyPrompt").addEventListener("click", async () => {
+      const button = document.getElementById("copyPrompt");
+      const status = document.getElementById("aiStatus");
+      if (!fields.rawContent.value.trim()) { status.textContent = "Add raw content first."; return; }
+      const prompt = makePrompt();
+      try {
+        await navigator.clipboard.writeText(prompt);
+        showButtonFeedback(button, "Copied");
+        status.textContent = "Prompt copied to clipboard.";
+      } catch {
+        fields.aiResponse.value = prompt;
+        showButtonFeedback(button, "Ready to copy");
+        status.textContent = "Clipboard blocked. Prompt placed in AI response box so you can copy it.";
+      }
+    });
+
+    function extractJSON(text) {
+      const match = text.match(/```(?:json)?\s*([\s\S]*?)```/);
+      return match ? match[1].trim() : text.trim();
+    }
+
+    function firstString(...values) {
+      return values.find((value) => typeof value === "string" && value.trim());
+    }
+
+    document.getElementById("copyImagePrompts").addEventListener("click", async () => {
+      const button = document.getElementById("copyImagePrompts");
+      const status = document.getElementById("aiStatus");
+      const text = imagePromptText();
+      if (!text) { status.textContent = "Fill or paste image prompts first."; return; }
+      try {
+        await navigator.clipboard.writeText(text);
+        showButtonFeedback(button, "Copied");
+        status.textContent = "Image prompts copied to clipboard.";
+      } catch {
+        fields.aiResponse.value = text;
+        showButtonFeedback(button, "Ready to copy");
+        status.textContent = "Clipboard blocked. Image prompts placed in AI response box so you can copy them.";
+      }
+    });
+
+    document.querySelectorAll("[data-copy-field]").forEach((button) => {
+      button.addEventListener("click", async () => {
+        const status = document.getElementById("aiStatus");
+        const field = fields[button.dataset.copyField];
+        const text = field ? field.value.trim() : "";
+        if (!text) { status.textContent = "Fill this image prompt first."; return; }
+        try {
+          await navigator.clipboard.writeText(text);
+          showButtonFeedback(button, "Copied");
+          status.textContent = "Image prompt copied to clipboard.";
+        } catch {
+          fields.aiResponse.value = text;
+          showButtonFeedback(button, "Ready");
+          status.textContent = "Clipboard blocked. Prompt placed in AI response box so you can copy it.";
+        }
+      });
+    });
+
+    document.getElementById("fillFields").addEventListener("click", () => {
+      const button = document.getElementById("fillFields");
+      const status = document.getElementById("aiStatus");
+      const text = fields.aiResponse.value.trim();
+      if (!text) { status.textContent = "Paste a JSON response first."; return; }
+      try {
+        const data = JSON.parse(extractJSON(text));
+        ["hook", "subline", "beat1Label", "beat1", "beat1Subtext", "beat2Label", "beat2", "beat2Subtext",
+         "beat3Label", "beat3", "beat3Subtext", "caption"].forEach((key) => {
+          if (typeof data[key] === "string" && fields[key]) fields[key].value = data[key];
+        });
+        if (typeof data.hashtags === "string") fields.hashtags.value = data.hashtags.toLowerCase();
+        if (typeof data.beat4Label === "string") fields.ctaLabel.value = data.beat4Label;
+        if (typeof data.beat4 === "string") fields.cta.value = data.beat4;
+        if (typeof data.beat4Subtext === "string") fields.ctaSubtext.value = data.beat4Subtext;
+        if (typeof data.cta === "string" && typeof data.beat4 !== "string") fields.cta.value = data.cta;
+        if (typeof data.ctaSubtext === "string" && typeof data.beat4Subtext !== "string") fields.ctaSubtext.value = data.ctaSubtext;
+        const imagePrompts = data.imagePrompts && typeof data.imagePrompts === "object" ? data.imagePrompts : {};
+        const promptValues = {
+          imagePromptHook: firstString(data.imagePromptHook, imagePrompts.hook, imagePrompts.hero, imagePrompts.intro),
+          imagePromptBeat1: firstString(data.imagePromptBeat1, imagePrompts.beat1),
+          imagePromptBeat2: firstString(data.imagePromptBeat2, imagePrompts.beat2),
+          imagePromptBeat3: firstString(data.imagePromptBeat3, imagePrompts.beat3),
+          imagePromptBeat4: firstString(data.imagePromptBeat4, imagePrompts.beat4, imagePrompts.cta)
+        };
+        Object.entries(promptValues).forEach(([key, value]) => {
+          if (value && fields[key]) fields[key].value = value;
+        });
+        updateTimeline();
+        showButtonFeedback(button, "Filled");
+        status.textContent = "Fields and image prompts filled from JSON.";
+      } catch {
+        status.textContent = "Could not parse JSON. Check for extra text or invalid quotes.";
+      }
+    });
+
+    // ── Download ──────────────────────────────────────────
+    function pickMimeType() {
+      const options = ["video/webm;codecs=vp9", "video/webm;codecs=vp8", "video/webm", "video/mp4;codecs=h264", "video/mp4"];
+      return options.find((type) => window.MediaRecorder && MediaRecorder.isTypeSupported(type)) || "";
+    }
+
+    document.getElementById("download").addEventListener("click", async () => {
+      const button = document.getElementById("download");
+      const status = document.getElementById("downloadStatus");
+
+      if (!window.MediaRecorder || !canvas.captureStream) {
+        status.textContent = "This browser cannot record canvas video. Try Chrome or Safari.";
+        return;
+      }
+
+      const mimeType = pickMimeType();
+      if (!mimeType) { status.textContent = "No supported video recorder found in this browser."; return; }
+
+      const chunks = [];
+      const stream = canvas.captureStream(FPS);
+      const recorder = new MediaRecorder(stream, { mimeType, videoBitsPerSecond: 9000000 });
+
+      recorder.ondataavailable = (event) => {
+        if (event.data && event.data.size > 0) chunks.push(event.data);
+      };
+
+      recorder.onstop = () => {
+        stream.getTracks().forEach((track) => track.stop());
+        const blob = new Blob(chunks, { type: mimeType });
+        const extension = mimeType.includes("mp4") ? "mp4" : "webm";
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = "sattva-reel." + extension;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        URL.revokeObjectURL(url);
+        button.disabled = false;
+        button.textContent = "Download Reel";
+        showButtonFeedback(button, "Downloaded");
+        status.textContent = "Downloaded sattva-reel." + extension + ".";
+        exportMode = false;
+        loopStart = performance.now();
+      };
+
+      button.disabled = true;
+      button.textContent = "Recording...";
+      status.textContent = "Recording " + (mimeType.includes("mp4") ? "MP4 fallback" : "WebM") + " at 1080x1920 for " + (DURATION / 1000).toFixed(1) + " seconds.";
+      exportMode = true;
+      draw(0);
+      recorder.start();
+
+      const startedAt = performance.now();
+      function exportFrame(now) {
+        const elapsed = Math.min(now - startedAt, DURATION);
+        draw(elapsed);
+        if (elapsed < DURATION) { requestAnimationFrame(exportFrame); }
+        else { setTimeout(() => recorder.stop(), 180); }
+      }
+      requestAnimationFrame(exportFrame);
+    });
+  </script>
+</body>
+</html>
