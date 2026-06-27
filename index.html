@@ -2338,14 +2338,10 @@
       const textStart = mode === "badge" ? markW + 16 : markW * 0.94;
 
       ctx.save();
-      // Measure the lockup width to honour the chosen position.
+      // Measure "Sattva" — the tagline is fitted to this width below.
       ctx.font = "700 44px 'Fraunces', Georgia, serif";
       const sattvaW = ctx.measureText("Sattva").width;
-      ctx.font = "500 15px 'JetBrains Mono', ui-monospace, monospace";
-      if ("letterSpacing" in ctx) ctx.letterSpacing = "3px";
-      const tagW = ctx.measureText("YOUR GUT, YOUR WAY").width;
-      if ("letterSpacing" in ctx) ctx.letterSpacing = "0px";
-      const lockupW = textStart + Math.max(sattvaW, tagW);
+      const lockupW = textStart + sattvaW;
 
       const pos = (fields.watermarkPos && fields.watermarkPos.value) || "left";
       const margin = 60;
@@ -2372,10 +2368,15 @@
       ctx.font = "700 44px 'Fraunces', Georgia, serif";
       ctx.fillText("Sattva", tx, sattvaBaseline);
 
+      // Tagline: scale horizontally to sit right under "Sattva".
       ctx.globalAlpha = 0.9;
-      ctx.font = "500 15px 'JetBrains Mono', ui-monospace, monospace";
-      if ("letterSpacing" in ctx) ctx.letterSpacing = "3px";
-      ctx.fillText("YOUR GUT, YOUR WAY", tx + 2, tagBaseline);
+      ctx.font = "500 16px 'JetBrains Mono', ui-monospace, monospace";
+      if ("letterSpacing" in ctx) ctx.letterSpacing = "1px";
+      const tagNat = ctx.measureText("YOUR GUT, YOUR WAY").width;
+      const tagScale = Math.min(1, sattvaW / tagNat);
+      ctx.translate(tx + 2, tagBaseline);
+      ctx.scale(tagScale, 1);
+      ctx.fillText("YOUR GUT, YOUR WAY", 0, 0);
       if ("letterSpacing" in ctx) ctx.letterSpacing = "0px";
       ctx.restore();
     }
