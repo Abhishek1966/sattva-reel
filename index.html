@@ -2331,7 +2331,10 @@
       // square. Leave a clear gap so the text never touches the mark.
       const tx = mode === "badge" ? x + markW + 16 : x + markW * 0.94;
       const textColor = mode === "sage" ? "#234c39" : "#ffffff";
-      const baseline = y + markH * 0.46;
+      // Visible figure bottom: ~80% of the box for the padded transparent
+      // marks, full square for the badge. Align the tagline baseline to it.
+      const tagBaseline = y + (mode === "badge" ? markH - 10 : markH * 0.80);
+      const sattvaBaseline = tagBaseline - 26;
 
       ctx.textAlign = "left";
       ctx.textBaseline = "alphabetic";
@@ -2342,12 +2345,12 @@
       ctx.shadowOffsetY = 1;
       ctx.fillStyle = textColor;
       ctx.font = "700 44px 'Fraunces', Georgia, serif";
-      ctx.fillText("Sattva", tx, baseline);
+      ctx.fillText("Sattva", tx, sattvaBaseline);
 
       ctx.globalAlpha = 0.9;
       ctx.font = "500 15px 'JetBrains Mono', ui-monospace, monospace";
       if ("letterSpacing" in ctx) ctx.letterSpacing = "3px";
-      ctx.fillText("YOUR GUT, YOUR WAY", tx + 2, y + markH - 8);
+      ctx.fillText("YOUR GUT, YOUR WAY", tx + 2, tagBaseline);
       if ("letterSpacing" in ctx) ctx.letterSpacing = "0px";
       ctx.restore();
     }
