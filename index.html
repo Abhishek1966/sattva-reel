@@ -1643,6 +1643,14 @@
     let DURATION = 11000;
     const FPS = 30;
 
+    // Watermark mark images (actual logo art, served same-origin).
+    const markImages = {};
+    ["white", "sage", "badge"].forEach((k) => {
+      const im = new Image();
+      im.src = "wm-" + k + ".png";
+      markImages[k] = im;
+    });
+
     // ── Content Library ───────────────────────────────────
     const CONTENT_LIBRARY = [
       { id:16, phase:"1b", title:"Are you a Vata gut?",
@@ -2303,105 +2311,43 @@
       ctx.restore();
     }
 
-    // Sattva watermark: vector figure mark + "Sattva" + tagline, bottom-left.
+    // Sattva watermark: actual mark image + "Sattva" + tagline, bottom-left.
     function drawBrand() {
       const mode = (fields.watermark && fields.watermark.value) || "white";
       if (mode === "none") return;
+      const img = markImages[mode];
+      if (!img || !img.complete || !img.naturalWidth) return; // not loaded yet
 
-      const markH = 116;
-      const x = 64;
-      const y = H - markH - 64;
-
-      drawSattvaMark(x, y, markH, mode);
-
-      const textColor = mode === "sage" ? "#234c39" : "#ffffff";
-      const tx = x + markH + 26;
-      const sattvaBaseline = y + markH * 0.54;
+      const markH = 104;
+      const ar = img.naturalWidth / img.naturalHeight;
+      const markW = markH * ar;
+      const x = 60;
+      const y = H - markH - 60;
 
       ctx.save();
+      ctx.drawImage(img, x, y, markW, markH);
+
+      // Transparent figure marks have inner padding, so tuck text in closer;
+      // the badge fills its square, so sit text just outside it.
+      const tx = mode === "badge" ? x + markW + 10 : x + markW * 0.78;
+      const textColor = mode === "sage" ? "#234c39" : "#ffffff";
+      const baseline = y + markH * 0.5;
+
       ctx.textAlign = "left";
       ctx.textBaseline = "alphabetic";
-      ctx.shadowColor = mode === "sage" ? "rgba(246,239,229,0.5)" : "rgba(20,17,12,0.4)";
-      ctx.shadowBlur = 12;
+      ctx.shadowColor = mode === "sage" ? "rgba(246,239,229,0.55)" : "rgba(20,17,12,0.5)";
+      ctx.shadowBlur = 10;
       ctx.shadowOffsetY = 2;
       ctx.fillStyle = textColor;
-      ctx.font = "700 60px 'Fraunces', Georgia, serif";
-      ctx.fillText("Sattva", tx, sattvaBaseline);
+      ctx.font = "700 44px 'Fraunces', Georgia, serif";
+      ctx.fillText("Sattva", tx, baseline);
 
-      ctx.shadowBlur = 6;
-      ctx.fillStyle = textColor;
-      ctx.globalAlpha = mode === "sage" ? 0.82 : 0.9;
-      ctx.font = "500 20px 'JetBrains Mono', ui-monospace, monospace";
-      if ("letterSpacing" in ctx) ctx.letterSpacing = "5px";
-      ctx.fillText("YOUR GUT, YOUR WAY", tx + 2, sattvaBaseline + 32);
+      ctx.shadowBlur = 5;
+      ctx.globalAlpha = mode === "sage" ? 0.85 : 0.92;
+      ctx.font = "500 15px 'JetBrains Mono', ui-monospace, monospace";
+      if ("letterSpacing" in ctx) ctx.letterSpacing = "3px";
+      ctx.fillText("YOUR GUT, YOUR WAY", tx + 2, baseline + 23);
       if ("letterSpacing" in ctx) ctx.letterSpacing = "0px";
-      ctx.restore();
-    }
-
-    // Vector figure mark (head + body + gut coil) at (x,y) with given height.
-    // mode: "white" | "sage" | "badge".
-    function drawSattvaMark(x, y, size, mode) {
-      const s = size / 100;
-      ctx.save();
-      ctx.translate(x, y);
-      ctx.scale(s, s);
-
-      if (mode === "badge") {
-        ctx.save();
-        ctx.shadowColor = "rgba(20,17,12,0.32)";
-        ctx.shadowBlur = 14;
-        ctx.shadowOffsetY = 4;
-        ctx.fillStyle = "#2f5d45";
-        ctx.beginPath();
-        ctx.roundRect(0, 0, 100, 100, 24);
-        ctx.fill();
-        ctx.restore();
-      }
-
-      const figFill = mode === "sage" ? "#2f5d45" : "#ffffff";
-      if (mode !== "badge") {
-        ctx.shadowColor = "rgba(20,17,12,0.28)";
-        ctx.shadowBlur = 10;
-        ctx.shadowOffsetY = 3;
-      }
-      ctx.fillStyle = figFill;
-      // head
-      ctx.beginPath();
-      ctx.arc(50, 24, 13, 0, Math.PI * 2);
-      ctx.fill();
-      // body
-      ctx.beginPath();
-      ctx.moveTo(23, 84);
-      ctx.bezierCurveTo(23, 53, 35, 40, 50, 40);
-      ctx.bezierCurveTo(65, 40, 77, 53, 77, 84);
-      ctx.bezierCurveTo(77, 87, 67, 88, 50, 88);
-      ctx.bezierCurveTo(33, 88, 23, 87, 23, 84);
-      ctx.closePath();
-      ctx.fill();
-
-      // gut coil — vertical blue→orange→brown gradient
-      ctx.shadowColor = "transparent";
-      ctx.shadowBlur = 0;
-      ctx.shadowOffsetY = 0;
-      const g = ctx.createLinearGradient(0, 56, 0, 78);
-      g.addColorStop(0, "#6f96b8");
-      g.addColorStop(0.5, "#c2683f");
-      g.addColorStop(1, "#8a5a33");
-      ctx.strokeStyle = g;
-      ctx.lineWidth = 4.6;
-      ctx.lineCap = "round";
-      ctx.lineJoin = "round";
-      ctx.beginPath();
-      ctx.moveTo(45, 57);
-      ctx.lineTo(54, 57);
-      ctx.quadraticCurveTo(59, 57, 59, 61.5);
-      ctx.quadraticCurveTo(59, 66, 54, 66);
-      ctx.lineTo(46, 66);
-      ctx.quadraticCurveTo(41, 66, 41, 70.5);
-      ctx.quadraticCurveTo(41, 75, 46, 75);
-      ctx.lineTo(55, 75);
-      ctx.stroke();
-
       ctx.restore();
     }
 
