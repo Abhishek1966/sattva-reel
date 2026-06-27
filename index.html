@@ -1210,6 +1210,13 @@
                   <option value="justify">Justified</option>
                 </select>
               </label>
+              <label>Position
+                <select id="hookVPos" class="compact-select">
+                  <option value="top">Top</option>
+                  <option value="center" selected>Center</option>
+                  <option value="bottom">Bottom</option>
+                </select>
+              </label>
             </div>
           </div>
           <div class="field-tools">
@@ -1240,6 +1247,13 @@
                   <option value="left">Left</option>
                   <option value="right">Right</option>
                   <option value="justify">Justified</option>
+                </select>
+              </label>
+              <label>Position
+                <select id="beat1VPos" class="compact-select">
+                  <option value="top">Top</option>
+                  <option value="center" selected>Center</option>
+                  <option value="bottom">Bottom</option>
                 </select>
               </label>
             </div>
@@ -1274,6 +1288,13 @@
                   <option value="justify">Justified</option>
                 </select>
               </label>
+              <label>Position
+                <select id="beat2VPos" class="compact-select">
+                  <option value="top">Top</option>
+                  <option value="center" selected>Center</option>
+                  <option value="bottom">Bottom</option>
+                </select>
+              </label>
             </div>
           </div>
           <div class="field-tools">
@@ -1306,6 +1327,13 @@
                   <option value="justify">Justified</option>
                 </select>
               </label>
+              <label>Position
+                <select id="beat3VPos" class="compact-select">
+                  <option value="top">Top</option>
+                  <option value="center" selected>Center</option>
+                  <option value="bottom">Bottom</option>
+                </select>
+              </label>
             </div>
           </div>
           <div class="field-tools">
@@ -1336,6 +1364,13 @@
                   <option value="left">Left</option>
                   <option value="right">Right</option>
                   <option value="justify">Justified</option>
+                </select>
+              </label>
+              <label>Position
+                <select id="ctaVPos" class="compact-select">
+                  <option value="top">Top</option>
+                  <option value="center" selected>Center</option>
+                  <option value="bottom">Bottom</option>
                 </select>
               </label>
             </div>
@@ -1378,6 +1413,8 @@
               </label>
               <label>Readability Overlay
                 <select id="overlayStrength">
+                  <option value="none">None</option>
+                  <option value="faint">Faint</option>
                   <option value="subtle">Subtle</option>
                   <option value="medium">Medium</option>
                   <option value="strong">Strong</option>
@@ -1385,11 +1422,12 @@
                   <option value="max">Max</option>
                 </select>
               </label>
-              <label>Text Position
-                <select id="textPosition">
-                  <option value="top">Top</option>
-                  <option value="center" selected>Center</option>
-                  <option value="bottom">Bottom</option>
+              <label>Text Background
+                <select id="textBg">
+                  <option value="off" selected>Off</option>
+                  <option value="gold">Gold box (#78561a)</option>
+                  <option value="black">Black box</option>
+                  <option value="white">White box</option>
                 </select>
               </label>
               <label>Text Size
@@ -1721,30 +1759,35 @@
       hook: document.getElementById("hook"),
       hookColor: document.getElementById("hookColor"),
       hookAlign: document.getElementById("hookAlign"),
+      hookVPos: document.getElementById("hookVPos"),
       subline: document.getElementById("subline"),
       beat1Label: document.getElementById("beat1Label"),
       beat1: document.getElementById("beat1"),
       beat1Color: document.getElementById("beat1Color"),
       beat1Align: document.getElementById("beat1Align"),
+      beat1VPos: document.getElementById("beat1VPos"),
       beat1Subtext: document.getElementById("beat1Subtext"),
       beat2Label: document.getElementById("beat2Label"),
       beat2: document.getElementById("beat2"),
       beat2Color: document.getElementById("beat2Color"),
       beat2Align: document.getElementById("beat2Align"),
+      beat2VPos: document.getElementById("beat2VPos"),
       beat2Subtext: document.getElementById("beat2Subtext"),
       beat3Label: document.getElementById("beat3Label"),
       beat3: document.getElementById("beat3"),
       beat3Color: document.getElementById("beat3Color"),
       beat3Align: document.getElementById("beat3Align"),
+      beat3VPos: document.getElementById("beat3VPos"),
       beat3Subtext: document.getElementById("beat3Subtext"),
       ctaLabel: document.getElementById("ctaLabel"),
       cta: document.getElementById("cta"),
       ctaColor: document.getElementById("ctaColor"),
       ctaAlign: document.getElementById("ctaAlign"),
+      ctaVPos: document.getElementById("ctaVPos"),
       ctaSubtext: document.getElementById("ctaSubtext"),
       handle: document.getElementById("handle"),
       imageFit: document.getElementById("imageFit"),
-      textPosition: document.getElementById("textPosition"),
+      textBg: document.getElementById("textBg"),
       textSize: document.getElementById("textSize"),
       textSpeed: document.getElementById("textSpeed"),
       textAnimation: document.getElementById("textAnimation"),
@@ -2196,27 +2239,33 @@
     }
 
     function drawOverlays(sceneKey, progress) {
-      const strength = {
-        subtle: { bottom: 0.55, scene: 0.30 },
-        medium: { bottom: 0.78, scene: 0.48 },
-        strong: { bottom: 0.90, scene: 0.62 },
-        heavy:  { bottom: 0.97, scene: 0.80 },
-        max:    { bottom: 1.00, scene: 0.92 }
-      }[fields.overlayStrength.value] || { bottom: 0.97, scene: 0.80 };
+      const p = {
+        none:   { top: 0.00, bottom: 0.00, scene: 0.00 },
+        faint:  { top: 0.35, bottom: 0.35, scene: 0.16 },
+        subtle: { top: 0.60, bottom: 0.55, scene: 0.30 },
+        medium: { top: 0.82, bottom: 0.78, scene: 0.48 },
+        strong: { top: 1.00, bottom: 0.90, scene: 0.62 },
+        heavy:  { top: 1.00, bottom: 0.97, scene: 0.80 },
+        max:    { top: 1.00, bottom: 1.00, scene: 0.92 }
+      }[fields.overlayStrength.value] || { top: 1.00, bottom: 0.97, scene: 0.80 };
 
-      const top = ctx.createLinearGradient(0, 0, 0, H);
-      top.addColorStop(0, "rgba(53,42,31,0.28)");
-      top.addColorStop(0.36, "rgba(53,42,31,0.18)");
-      top.addColorStop(0.64, "rgba(53,42,31,0.46)");
-      top.addColorStop(1, "rgba(53,42,31," + strength.bottom + ")");
-      ctx.fillStyle = top;
-      ctx.fillRect(0, 0, W, H);
+      if (p.top > 0 || p.bottom > 0) {
+        const top = ctx.createLinearGradient(0, 0, 0, H);
+        top.addColorStop(0, "rgba(53,42,31," + (0.28 * p.top) + ")");
+        top.addColorStop(0.36, "rgba(53,42,31," + (0.18 * p.top) + ")");
+        top.addColorStop(0.64, "rgba(53,42,31," + (0.46 * p.top) + ")");
+        top.addColorStop(1, "rgba(53,42,31," + p.bottom + ")");
+        ctx.fillStyle = top;
+        ctx.fillRect(0, 0, W, H);
+      }
 
       // Flat scrim behind body text. Hook gets a lighter scrim so the
       // image still reads; beats get the full scene strength.
-      const flat = sceneKey === "hook" ? strength.scene * 0.5 : strength.scene;
-      ctx.fillStyle = "rgba(53,42,31," + flat + ")";
-      ctx.fillRect(0, 0, W, H);
+      const flat = sceneKey === "hook" ? p.scene * 0.5 : p.scene;
+      if (flat > 0) {
+        ctx.fillStyle = "rgba(53,42,31," + flat + ")";
+        ctx.fillRect(0, 0, W, H);
+      }
 
       ctx.save();
       ctx.globalAlpha = 0.16;
@@ -2341,9 +2390,10 @@
       return { small: 0.85, normal: 1, large: 1.18, xlarge: 1.36 }[fields.textSize.value] || 1;
     }
 
-    // Resolve the block's top Y for the chosen Top / Center / Bottom placement.
-    function placeBlockY(centerY, blockHeight, topMargin, bottomMargin) {
-      const pos = fields.textPosition.value;
+    // Resolve a block's top Y for its per-beat Top / Center / Bottom placement.
+    function placeBlockY(key, centerY, blockHeight, topMargin, bottomMargin) {
+      const sel = fields[key + "VPos"];
+      const pos = sel ? sel.value : "center";
       if (pos === "top") return topMargin;
       if (pos === "bottom") return Math.max(topMargin, H - bottomMargin - blockHeight);
       return centerY;
@@ -2382,8 +2432,51 @@
       return colorKey === "brown" ? "rgba(246,239,229,0.58)" : "rgba(53,42,31,0.64)";
     }
 
+    function fontPx() {
+      const m = /(\d+(?:\.\d+)?)px/.exec(ctx.font);
+      return m ? parseFloat(m[1]) : 40;
+    }
+
+    function textBgColor() {
+      return {
+        off: null,
+        gold: "#78561a",
+        black: "rgba(20,17,12,0.82)",
+        white: "rgba(245,239,229,0.94)"
+      }[fields.textBg.value] || null;
+    }
+
+    // CapCut-style per-line highlight boxes behind text (always-readable).
+    function drawLineBoxes(lines, x, y, lineHeight, align, maxWidth, color) {
+      const fs = fontPx();
+      const padX = fs * 0.24, padY = fs * 0.16;
+      const r = Math.min(16, fs * 0.28);
+      ctx.save();
+      ctx.shadowColor = "transparent";
+      ctx.shadowBlur = 0;
+      ctx.shadowOffsetY = 0;
+      ctx.fillStyle = color;
+      lines.forEach((line, i) => {
+        const t = String(line || "");
+        if (!t.trim()) return;
+        let w = ctx.measureText(t).width;
+        let left;
+        if (align === "justify" && i < lines.length - 1) { left = x; w = maxWidth; }
+        else if (align === "center") left = x + maxWidth / 2 - w / 2;
+        else if (align === "right") left = x + maxWidth - w;
+        else left = x;
+        const top = y + i * lineHeight - padY * 0.5;
+        ctx.beginPath();
+        ctx.roundRect(left - padX, top, w + padX * 2, fs * 1.02 + padY, r);
+        ctx.fill();
+      });
+      ctx.restore();
+    }
+
     function drawTextLines(lines, x, y, lineHeight, align, maxWidth) {
       ctx.textBaseline = "top";
+      const bg = textBgColor();
+      if (bg) drawLineBoxes(lines, x, y, lineHeight, align, maxWidth, bg);
       lines.forEach((line, index) => {
         const lineY = y + index * lineHeight;
         if (align === "justify" && index < lines.length - 1 && line.includes(" ") && maxWidth) {
@@ -2432,7 +2525,7 @@
       const subHeight = sub ? sub.lines.length * sub.size * 1.34 : 0;
       const totalHeight = hookHeight + (hasSubline ? 54 + subHeight : 0);
       const centerY = clamp((H - totalHeight) / 2 - 90, 230, 560);
-      const startY = placeBlockY(centerY, totalHeight, 150, 210);
+      const startY = placeBlockY("hook", centerY, totalHeight, 150, 210);
 
       ctx.save();
       const yOffset = 22 * (1 - easeOutCubic(progress));
@@ -2486,7 +2579,7 @@
       const subHeight = fittedSubtext ? fittedSubtext.lines.length * fittedSubtext.size * 1.34 : 0;
       const contentHeight = labelHeight + labelGap + hookHeight + (hasSubtext ? 50 + subHeight : 0);
       const centerTop = clamp((H - contentHeight) / 2 - 80, 250, 650);
-      const contentTop = placeBlockY(centerTop, contentHeight, 170, 220);
+      const contentTop = placeBlockY(key, centerTop, contentHeight, 170, 220);
       const labelY = contentTop;
       const barY = labelText ? labelY + labelHeight + 28 : contentTop;
       const hookY = labelText ? barY + 48 : contentTop;
