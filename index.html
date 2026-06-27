@@ -869,6 +869,22 @@
       border-radius: 18px;
     }
 
+    .edit-card {
+      width: 100%;
+      max-width: 360px;
+      display: grid;
+      gap: 8px;
+    }
+
+    .edit-bar {
+      display: flex;
+      gap: 8px;
+      align-items: stretch;
+    }
+
+    .edit-bar .button { flex: 1; min-height: 42px; padding: 10px 12px; }
+    .edit-bar select { flex: 1; }
+
     .export-card {
       width: 100%;
       max-width: 360px;
@@ -1102,7 +1118,8 @@
 
       .preview-pane .stage-wrap::before { content: none; }
       .preview-pane .stage { width: 100%; max-width: 412px; border-radius: 18px; }
-      .preview-pane .export-card { max-width: 412px; }
+      .preview-pane .export-card,
+      .preview-pane .edit-card { max-width: 412px; }
 
       .current-section { display: none; }
     }
@@ -1426,7 +1443,6 @@
                 <select id="textBg">
                   <option value="off" selected>Off</option>
                   <option value="gold">Gold box (#78561a)</option>
-                  <option value="terracotta">Terracotta box</option>
                   <option value="black">Black box</option>
                   <option value="white">White box</option>
                 </select>
@@ -1552,6 +1568,20 @@
           <canvas id="reel" width="1080" height="1920"></canvas>
         </div>
         <div class="preview-meta"><span class="dot"></span><span>Live 1080×1920 preview · <span id="previewDuration">11.0</span>s loop</span></div>
+        <div class="edit-card">
+          <div class="edit-bar">
+            <button class="button secondary" id="editToggle" type="button">Move / Resize Text</button>
+            <select id="editScene" class="compact-select" hidden>
+              <option value="hook">Hook</option>
+              <option value="beat1">Beat 1</option>
+              <option value="beat2">Beat 2</option>
+              <option value="beat3">Beat 3</option>
+              <option value="cta">Beat 4 / CTA</option>
+            </select>
+            <button class="button secondary" id="editReset" type="button" hidden>Reset</button>
+          </div>
+          <div class="status" id="editStatus" hidden>Drag the text to move it. Drag the gold corner to resize. Applies to that scene in the reel and posts.</div>
+        </div>
         <div class="export-card">
           <button class="button full primary-cta" id="download" type="button">Download Reel (.webm)</button>
           <div class="status" id="downloadStatus">Chrome records the canvas to WebM. Convert to MP4 with HandBrake or ffmpeg afterwards. Duration: <span id="durationLabel">11.0</span>s.</div>
@@ -1819,6 +1849,18 @@
 
     let loopStart = performance.now();
     let exportMode = false;
+
+    // Per-scene free transform (move + resize), applied in all renders + exports.
+    const transform = {
+      hook:  { dx: 0, dy: 0, scale: 1 },
+      beat1: { dx: 0, dy: 0, scale: 1 },
+      beat2: { dx: 0, dy: 0, scale: 1 },
+      beat3: { dx: 0, dy: 0, scale: 1 },
+      cta:   { dx: 0, dy: 0, scale: 1 }
+    };
+    const lastBlockRect = {};   // base (untransformed) text-block rect per scene
+    let editMode = false;
+    let editKey = "hook";
 
     const COLORS = {
       earth: "#67523b",
@@ -2400,6 +2442,18 @@
       return centerY;
     }
 
+    // Apply a scene's free transform: translate by (dx,dy), scale about (cx,cy).
+    function applyTransform(key, cx, cy) {
+      const tf = transform[key];
+      if (!tf) return;
+      ctx.translate(tf.dx, tf.dy);
+      if (tf.scale !== 1) {
+        ctx.translate(cx, cy);
+        ctx.scale(tf.scale, tf.scale);
+        ctx.translate(-cx, -cy);
+      }
+    }
+
     function typeTextTimed(text, elapsedMs, startMs) {
       const normalized = String(text || "");
       if (fields.textAnimation.value === "none") return normalized;
@@ -2442,7 +2496,6 @@
       return {
         off: null,
         gold: "#78561a",
-        terracotta: "#b85a3a",
         black: "rgba(20,17,12,0.82)",
         white: "rgba(245,239,229,0.94)"
       }[fields.textBg.value] || null;
@@ -2529,9 +2582,12 @@
       const centerY = clamp((H - totalHeight) / 2 - 90, 230, 560);
       const startY = placeBlockY("hook", centerY, totalHeight, 150, 210);
 
+      lastBlockRect.hook = { x: 72, y: startY, w: hookMaxWidth, h: totalHeight };
+
       ctx.save();
       const yOffset = 22 * (1 - easeOutCubic(progress));
       ctx.translate(0, yOffset);
+      applyTransform("hook", 72 + hookMaxWidth / 2, startY + totalHeight / 2);
       ctx.shadowColor = textShadowColor("hook");
       ctx.shadowBlur = 20;
       ctx.shadowOffsetY = 3;
@@ -2587,8 +2643,11 @@
       const hookY = labelText ? barY + 48 : contentTop;
       const subY = hookY + hookHeight + 50;
 
+      lastBlockRect[key] = { x: 75, y: contentTop, w: hookMaxWidth, h: contentHeight };
+
       ctx.save();
       ctx.translate(0, 28 * (1 - reveal));
+      applyTransform(key, 75 + hookMaxWidth / 2, contentTop + contentHeight / 2);
 
       if (labelText) {
         ctx.shadowColor = textShadowColor(key);
@@ -2656,7 +2715,7 @@
     }
 
     function animate(now) {
-      if (!exportMode) {
+      if (!exportMode && !editMode) {
         const ms = (now - loopStart) % DURATION;
         draw(ms);
       }
@@ -2743,6 +2802,117 @@
         button.textContent = original;
       }
     });
+
+    // ── Free transform editor (move + resize text per scene) ──
+    const editToggle = document.getElementById("editToggle");
+    const editScene = document.getElementById("editScene");
+    const editReset = document.getElementById("editReset");
+    const editStatus = document.getElementById("editStatus");
+
+    function dispRect(key) {
+      const r = lastBlockRect[key];
+      if (!r) return null;
+      const tf = transform[key];
+      const cx = r.x + r.w / 2, cy = r.y + r.h / 2;
+      const w = r.w * tf.scale, h = r.h * tf.scale;
+      return { x: cx + tf.dx - w / 2, y: cy + tf.dy - h / 2, w, h, cx: cx + tf.dx, cy: cy + tf.dy };
+    }
+
+    const HANDLE = 56; // canvas px
+
+    function drawEditHandles(key) {
+      const d = dispRect(key);
+      if (!d) return;
+      ctx.save();
+      ctx.strokeStyle = "#e0b15a";
+      ctx.lineWidth = 5;
+      ctx.setLineDash([18, 12]);
+      ctx.strokeRect(d.x, d.y, d.w, d.h);
+      ctx.setLineDash([]);
+      ctx.fillStyle = "#e0b15a";
+      ctx.fillRect(d.x + d.w - HANDLE / 2, d.y + d.h - HANDLE / 2, HANDLE, HANDLE);
+      ctx.restore();
+    }
+
+    function renderEditFrame() {
+      const s = scenes.find((x) => x.key === editKey) || scenes[0];
+      draw(s.start + (s.end - s.start) * 0.95);
+      drawEditHandles(editKey);
+    }
+
+    function setEdit(on) {
+      editMode = on;
+      editToggle.textContent = on ? "Done" : "Move / Resize Text";
+      editToggle.classList.toggle("is-done", on);
+      editScene.hidden = !on;
+      editReset.hidden = !on;
+      editStatus.hidden = !on;
+      canvas.style.touchAction = on ? "none" : "";
+      canvas.style.cursor = on ? "move" : "";
+      if (on) renderEditFrame();
+      else loopStart = performance.now();
+    }
+
+    editToggle.addEventListener("click", () => setEdit(!editMode));
+    editScene.addEventListener("change", () => { editKey = editScene.value; renderEditFrame(); });
+    editReset.addEventListener("click", () => {
+      transform[editKey] = { dx: 0, dy: 0, scale: 1 };
+      renderEditFrame();
+    });
+
+    function toCanvasCoords(e) {
+      const r = canvas.getBoundingClientRect();
+      return {
+        x: (e.clientX - r.left) / r.width * canvas.width,
+        y: (e.clientY - r.top) / r.height * canvas.height
+      };
+    }
+
+    let drag = null;
+    canvas.addEventListener("pointerdown", (e) => {
+      if (!editMode) return;
+      const d = dispRect(editKey);
+      if (!d) return;
+      const p = toCanvasCoords(e);
+      const hx = d.x + d.w, hy = d.y + d.h;
+      const onHandle = Math.abs(p.x - hx) <= HANDLE && Math.abs(p.y - hy) <= HANDLE;
+      const inside = p.x >= d.x && p.x <= d.x + d.w && p.y >= d.y && p.y <= d.y + d.h;
+      if (!onHandle && !inside) return;
+      const tf = transform[editKey];
+      drag = {
+        mode: onHandle ? "resize" : "move",
+        startX: p.x, startY: p.y,
+        dx: tf.dx, dy: tf.dy, scale: tf.scale,
+        cx: d.cx, cy: d.cy,
+        startDist: Math.hypot(p.x - d.cx, p.y - d.cy)
+      };
+      try { canvas.setPointerCapture(e.pointerId); } catch (_) {}
+      e.preventDefault();
+    });
+
+    canvas.addEventListener("pointermove", (e) => {
+      if (!drag) return;
+      const p = toCanvasCoords(e);
+      const tf = transform[editKey];
+      if (drag.mode === "move") {
+        tf.dx = drag.dx + (p.x - drag.startX);
+        tf.dy = drag.dy + (p.y - drag.startY);
+      } else {
+        const dist = Math.hypot(p.x - drag.cx, p.y - drag.cy);
+        const ratio = drag.startDist > 12 ? dist / drag.startDist : 1;
+        tf.scale = Math.max(0.3, Math.min(4, drag.scale * ratio));
+      }
+      renderEditFrame();
+      e.preventDefault();
+    });
+
+    function endDrag(e) {
+      if (!drag) return;
+      drag = null;
+      try { canvas.releasePointerCapture(e.pointerId); } catch (_) {}
+    }
+    canvas.addEventListener("pointerup", endDrag);
+    canvas.addEventListener("pointercancel", endDrag);
 
     // ── AI Helper ─────────────────────────────────────────
     function makePrompt() {
