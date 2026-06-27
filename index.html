@@ -1227,13 +1227,6 @@
                   <option value="justify">Justified</option>
                 </select>
               </label>
-              <label>Position
-                <select id="hookVPos" class="compact-select">
-                  <option value="top">Top</option>
-                  <option value="center" selected>Center</option>
-                  <option value="bottom">Bottom</option>
-                </select>
-              </label>
             </div>
           </div>
           <div class="field-tools">
@@ -1264,13 +1257,6 @@
                   <option value="left">Left</option>
                   <option value="right">Right</option>
                   <option value="justify">Justified</option>
-                </select>
-              </label>
-              <label>Position
-                <select id="beat1VPos" class="compact-select">
-                  <option value="top">Top</option>
-                  <option value="center" selected>Center</option>
-                  <option value="bottom">Bottom</option>
                 </select>
               </label>
             </div>
@@ -1305,13 +1291,6 @@
                   <option value="justify">Justified</option>
                 </select>
               </label>
-              <label>Position
-                <select id="beat2VPos" class="compact-select">
-                  <option value="top">Top</option>
-                  <option value="center" selected>Center</option>
-                  <option value="bottom">Bottom</option>
-                </select>
-              </label>
             </div>
           </div>
           <div class="field-tools">
@@ -1344,13 +1323,6 @@
                   <option value="justify">Justified</option>
                 </select>
               </label>
-              <label>Position
-                <select id="beat3VPos" class="compact-select">
-                  <option value="top">Top</option>
-                  <option value="center" selected>Center</option>
-                  <option value="bottom">Bottom</option>
-                </select>
-              </label>
             </div>
           </div>
           <div class="field-tools">
@@ -1381,13 +1353,6 @@
                   <option value="left">Left</option>
                   <option value="right">Right</option>
                   <option value="justify">Justified</option>
-                </select>
-              </label>
-              <label>Position
-                <select id="ctaVPos" class="compact-select">
-                  <option value="top">Top</option>
-                  <option value="center" selected>Center</option>
-                  <option value="bottom">Bottom</option>
                 </select>
               </label>
             </div>
@@ -1580,7 +1545,7 @@
             </select>
             <button class="button secondary" id="editReset" type="button" hidden>Reset</button>
           </div>
-          <div class="status" id="editStatus" hidden>Drag the text to move it. Drag the gold corner to resize. Applies to that scene in the reel and posts.</div>
+          <div class="status" id="editStatus" hidden>Pick a scene, then drag heading, subtext, or label to move each one. Drag its gold corner to resize. Saved into the reel and posts.</div>
         </div>
         <div class="export-card">
           <button class="button full primary-cta" id="download" type="button">Download Reel (.webm)</button>
@@ -1790,31 +1755,26 @@
       hook: document.getElementById("hook"),
       hookColor: document.getElementById("hookColor"),
       hookAlign: document.getElementById("hookAlign"),
-      hookVPos: document.getElementById("hookVPos"),
       subline: document.getElementById("subline"),
       beat1Label: document.getElementById("beat1Label"),
       beat1: document.getElementById("beat1"),
       beat1Color: document.getElementById("beat1Color"),
       beat1Align: document.getElementById("beat1Align"),
-      beat1VPos: document.getElementById("beat1VPos"),
       beat1Subtext: document.getElementById("beat1Subtext"),
       beat2Label: document.getElementById("beat2Label"),
       beat2: document.getElementById("beat2"),
       beat2Color: document.getElementById("beat2Color"),
       beat2Align: document.getElementById("beat2Align"),
-      beat2VPos: document.getElementById("beat2VPos"),
       beat2Subtext: document.getElementById("beat2Subtext"),
       beat3Label: document.getElementById("beat3Label"),
       beat3: document.getElementById("beat3"),
       beat3Color: document.getElementById("beat3Color"),
       beat3Align: document.getElementById("beat3Align"),
-      beat3VPos: document.getElementById("beat3VPos"),
       beat3Subtext: document.getElementById("beat3Subtext"),
       ctaLabel: document.getElementById("ctaLabel"),
       cta: document.getElementById("cta"),
       ctaColor: document.getElementById("ctaColor"),
       ctaAlign: document.getElementById("ctaAlign"),
-      ctaVPos: document.getElementById("ctaVPos"),
       ctaSubtext: document.getElementById("ctaSubtext"),
       handle: document.getElementById("handle"),
       imageFit: document.getElementById("imageFit"),
@@ -1850,17 +1810,16 @@
     let loopStart = performance.now();
     let exportMode = false;
 
-    // Per-scene free transform (move + resize), applied in all renders + exports.
-    const transform = {
-      hook:  { dx: 0, dy: 0, scale: 1 },
-      beat1: { dx: 0, dy: 0, scale: 1 },
-      beat2: { dx: 0, dy: 0, scale: 1 },
-      beat3: { dx: 0, dy: 0, scale: 1 },
-      cta:   { dx: 0, dy: 0, scale: 1 }
-    };
-    const lastBlockRect = {};   // base (untransformed) text-block rect per scene
+    // Per-ELEMENT free transform (move + resize), applied in all renders + exports.
+    // Keys: "hook","subline", and per beat: "<key>Label","<key>","<key>Sub".
+    const transforms = {};
+    function tf(key) {
+      return transforms[key] || (transforms[key] = { dx: 0, dy: 0, scale: 1 });
+    }
+    const lastBlockRect = {};   // base (untransformed) rect per element
     let editMode = false;
-    let editKey = "hook";
+    let editKey = "hook";        // the scene being edited
+    let activeEl = null;         // the element currently selected/dragged
 
     const COLORS = {
       earth: "#67523b",
@@ -2433,23 +2392,13 @@
       return { small: 0.85, normal: 1, large: 1.18, xlarge: 1.36 }[fields.textSize.value] || 1;
     }
 
-    // Resolve a block's top Y for its per-beat Top / Center / Bottom placement.
-    function placeBlockY(key, centerY, blockHeight, topMargin, bottomMargin) {
-      const sel = fields[key + "VPos"];
-      const pos = sel ? sel.value : "center";
-      if (pos === "top") return topMargin;
-      if (pos === "bottom") return Math.max(topMargin, H - bottomMargin - blockHeight);
-      return centerY;
-    }
-
-    // Apply a scene's free transform: translate by (dx,dy), scale about (cx,cy).
+    // Apply an element's free transform: translate by (dx,dy), scale about (cx,cy).
     function applyTransform(key, cx, cy) {
-      const tf = transform[key];
-      if (!tf) return;
-      ctx.translate(tf.dx, tf.dy);
-      if (tf.scale !== 1) {
+      const t = tf(key);
+      ctx.translate(t.dx, t.dy);
+      if (t.scale !== 1) {
         ctx.translate(cx, cy);
-        ctx.scale(tf.scale, tf.scale);
+        ctx.scale(t.scale, t.scale);
         ctx.translate(-cx, -cy);
       }
     }
@@ -2579,37 +2528,41 @@
       const hookHeight = hook.lines.length * hook.size * 1.08;
       const subHeight = sub ? sub.lines.length * sub.size * 1.34 : 0;
       const totalHeight = hookHeight + (hasSubline ? 54 + subHeight : 0);
-      const centerY = clamp((H - totalHeight) / 2 - 90, 230, 560);
-      const startY = placeBlockY("hook", centerY, totalHeight, 150, 210);
-
-      lastBlockRect.hook = { x: 72, y: startY, w: hookMaxWidth, h: totalHeight };
-
-      ctx.save();
+      const startY = clamp((H - totalHeight) / 2 - 90, 230, 560);
       const yOffset = 22 * (1 - easeOutCubic(progress));
+
+      // Heading — independently movable / resizable
+      lastBlockRect.hook = { x: 72, y: startY, w: hookMaxWidth, h: hookHeight };
+      ctx.save();
       ctx.translate(0, yOffset);
-      applyTransform("hook", 72 + hookMaxWidth / 2, startY + totalHeight / 2);
+      applyTransform("hook", 72 + hookMaxWidth / 2, startY + hookHeight / 2);
       ctx.shadowColor = textShadowColor("hook");
       ctx.shadowBlur = 20;
       ctx.shadowOffsetY = 3;
       ctx.fillStyle = selectedTextColor(0.94 * hookReveal.alpha, "hook");
       ctx.font = hook.font;
-      ctx.save();
       ctx.translate(72, startY + hookReveal.y);
       ctx.scale(hookReveal.scale, hookReveal.scale);
       drawTextLines(hook.lines, 0, 0, hook.size * 1.08, textAlignFor("hook", "left"), hookMaxWidth);
       ctx.restore();
 
+      // Subline — independently movable / resizable
       if (hasSubline && sub) {
+        const subTop = startY + hookHeight + 54;
+        lastBlockRect.subline = { x: 72, y: subTop, w: subMaxWidth, h: subHeight };
+        ctx.save();
+        ctx.translate(0, yOffset);
+        applyTransform("subline", 72 + subMaxWidth / 2, subTop + subHeight / 2);
         ctx.shadowColor = textShadowColor("subline");
         ctx.fillStyle = selectedTextColor(0.8 * subReveal.alpha, "subline");
         ctx.font = sub.font;
-        ctx.save();
-        ctx.translate(72, startY + hookHeight + 54 + subReveal.y);
+        ctx.translate(72, subTop + subReveal.y);
         ctx.scale(subReveal.scale, subReveal.scale);
         drawTextLines(sub.lines, 0, 0, sub.size * 1.34, textAlignFor("subline", "left"), subMaxWidth);
         ctx.restore();
+      } else {
+        delete lastBlockRect.subline;
       }
-      ctx.restore();
     }
 
     function drawBeat(progress, elapsedMs, key, label, text, subtext) {
@@ -2636,20 +2589,20 @@
       const hookHeight = fitted.lines.length * fitted.size * 1.1;
       const subHeight = fittedSubtext ? fittedSubtext.lines.length * fittedSubtext.size * 1.34 : 0;
       const contentHeight = labelHeight + labelGap + hookHeight + (hasSubtext ? 50 + subHeight : 0);
-      const centerTop = clamp((H - contentHeight) / 2 - 80, 250, 650);
-      const contentTop = placeBlockY(key, centerTop, contentHeight, 170, 220);
+      const contentTop = clamp((H - contentHeight) / 2 - 80, 250, 650);
       const labelY = contentTop;
       const barY = labelText ? labelY + labelHeight + 28 : contentTop;
       const hookY = labelText ? barY + 48 : contentTop;
       const subY = hookY + hookHeight + 50;
+      const blockYOffset = 28 * (1 - reveal);
 
-      lastBlockRect[key] = { x: 75, y: contentTop, w: hookMaxWidth, h: contentHeight };
-
-      ctx.save();
-      ctx.translate(0, 28 * (1 - reveal));
-      applyTransform(key, 75 + hookMaxWidth / 2, contentTop + contentHeight / 2);
-
+      // Label + accent bar — independently movable / resizable
       if (labelText) {
+        const lblH = labelHeight + 28 + 8;
+        lastBlockRect[key + "Label"] = { x: 75, y: labelY, w: labelMaxWidth, h: lblH };
+        ctx.save();
+        ctx.translate(0, blockYOffset);
+        applyTransform(key + "Label", 75 + labelMaxWidth / 2, labelY + lblH / 2);
         ctx.shadowColor = textShadowColor(key);
         ctx.shadowBlur = 20;
         ctx.shadowOffsetY = 3;
@@ -2663,30 +2616,42 @@
         ctx.shadowBlur = 0;
         ctx.shadowOffsetY = 0;
         ctx.fillRect(W / 2 - 58, barY, 116, 8);
+        ctx.restore();
+      } else {
+        delete lastBlockRect[key + "Label"];
       }
 
+      // Heading — independently movable / resizable
+      lastBlockRect[key] = { x: 75, y: hookY, w: hookMaxWidth, h: hookHeight };
+      ctx.save();
+      ctx.translate(0, blockYOffset);
+      applyTransform(key, 75 + hookMaxWidth / 2, hookY + hookHeight / 2);
       ctx.shadowColor = textShadowColor(key);
       ctx.shadowBlur = 18;
       ctx.shadowOffsetY = 3;
       ctx.fillStyle = selectedTextColor(0.9 * hookReveal.alpha, key);
       ctx.font = fitted.font;
-      ctx.save();
       ctx.translate(75, hookY + hookReveal.y);
       ctx.scale(hookReveal.scale, hookReveal.scale);
       drawTextLines(fitted.lines, 0, 0, fitted.size * 1.1, textAlignFor(key, "center"), hookMaxWidth);
       ctx.restore();
 
+      // Subtext — independently movable / resizable
       if (hasSubtext && fittedSubtext) {
+        lastBlockRect[key + "Sub"] = { x: 85, y: subY, w: subMaxWidth, h: subHeight };
+        ctx.save();
+        ctx.translate(0, blockYOffset);
+        applyTransform(key + "Sub", 85 + subMaxWidth / 2, subY + subHeight / 2);
         ctx.shadowColor = textShadowColor(key + "Subtext");
         ctx.fillStyle = selectedTextColor(0.78 * subReveal.alpha, key + "Subtext");
         ctx.font = fittedSubtext.font;
-        ctx.save();
         ctx.translate(85, subY + subReveal.y);
         ctx.scale(subReveal.scale, subReveal.scale);
         drawTextLines(fittedSubtext.lines, 0, 0, fittedSubtext.size * 1.34, textAlignFor(key + "Subtext", "center"), subMaxWidth);
         ctx.restore();
+      } else {
+        delete lastBlockRect[key + "Sub"];
       }
-      ctx.restore();
     }
 
     function draw(ms) {
@@ -2809,33 +2774,46 @@
     const editReset = document.getElementById("editReset");
     const editStatus = document.getElementById("editStatus");
 
+    const HANDLE = 56; // canvas px
+
+    // Element keys belonging to a scene (heading, subtext, label).
+    function sceneElements(sceneKey) {
+      if (sceneKey === "hook") return ["hook", "subline"];
+      return [sceneKey + "Label", sceneKey, sceneKey + "Sub"];
+    }
+    // The scene name used by the timeline (CTA renders under "beat4").
+    function sceneRenderKey(sceneKey) {
+      return sceneKey === "cta" ? "beat4" : sceneKey;
+    }
+
     function dispRect(key) {
       const r = lastBlockRect[key];
       if (!r) return null;
-      const tf = transform[key];
+      const t = tf(key);
       const cx = r.x + r.w / 2, cy = r.y + r.h / 2;
-      const w = r.w * tf.scale, h = r.h * tf.scale;
-      return { x: cx + tf.dx - w / 2, y: cy + tf.dy - h / 2, w, h, cx: cx + tf.dx, cy: cy + tf.dy };
+      const w = r.w * t.scale, h = r.h * t.scale;
+      return { x: cx + t.dx - w / 2, y: cy + t.dy - h / 2, w, h, cx: cx + t.dx, cy: cy + t.dy };
     }
 
-    const HANDLE = 56; // canvas px
-
-    function drawEditHandles(key) {
-      const d = dispRect(key);
-      if (!d) return;
-      ctx.save();
-      ctx.strokeStyle = "#e0b15a";
-      ctx.lineWidth = 5;
-      ctx.setLineDash([18, 12]);
-      ctx.strokeRect(d.x, d.y, d.w, d.h);
-      ctx.setLineDash([]);
-      ctx.fillStyle = "#e0b15a";
-      ctx.fillRect(d.x + d.w - HANDLE / 2, d.y + d.h - HANDLE / 2, HANDLE, HANDLE);
-      ctx.restore();
+    function drawEditHandles(sceneKey) {
+      sceneElements(sceneKey).forEach((k) => {
+        const d = dispRect(k);
+        if (!d) return;
+        const on = k === activeEl;
+        ctx.save();
+        ctx.strokeStyle = on ? "#f4cd7a" : "#e0b15a";
+        ctx.lineWidth = on ? 6 : 4;
+        ctx.setLineDash([18, 12]);
+        ctx.strokeRect(d.x, d.y, d.w, d.h);
+        ctx.setLineDash([]);
+        ctx.fillStyle = on ? "#f4cd7a" : "#e0b15a";
+        ctx.fillRect(d.x + d.w - HANDLE / 2, d.y + d.h - HANDLE / 2, HANDLE, HANDLE);
+        ctx.restore();
+      });
     }
 
     function renderEditFrame() {
-      const s = scenes.find((x) => x.key === editKey) || scenes[0];
+      const s = scenes.find((x) => x.key === sceneRenderKey(editKey)) || scenes[0];
       draw(s.start + (s.end - s.start) * 0.95);
       drawEditHandles(editKey);
     }
@@ -2854,9 +2832,10 @@
     }
 
     editToggle.addEventListener("click", () => setEdit(!editMode));
-    editScene.addEventListener("change", () => { editKey = editScene.value; renderEditFrame(); });
+    editScene.addEventListener("change", () => { editKey = editScene.value; activeEl = null; renderEditFrame(); });
     editReset.addEventListener("click", () => {
-      transform[editKey] = { dx: 0, dy: 0, scale: 1 };
+      sceneElements(editKey).forEach((k) => { transforms[k] = { dx: 0, dy: 0, scale: 1 }; });
+      activeEl = null;
       renderEditFrame();
     });
 
@@ -2871,36 +2850,54 @@
     let drag = null;
     canvas.addEventListener("pointerdown", (e) => {
       if (!editMode) return;
-      const d = dispRect(editKey);
-      if (!d) return;
       const p = toCanvasCoords(e);
-      const hx = d.x + d.w, hy = d.y + d.h;
-      const onHandle = Math.abs(p.x - hx) <= HANDLE && Math.abs(p.y - hy) <= HANDLE;
-      const inside = p.x >= d.x && p.x <= d.x + d.w && p.y >= d.y && p.y <= d.y + d.h;
-      if (!onHandle && !inside) return;
-      const tf = transform[editKey];
+      const els = sceneElements(editKey).filter((k) => lastBlockRect[k]);
+      let pick = null, mode = null;
+      // Prefer a resize handle.
+      for (const k of els) {
+        const d = dispRect(k);
+        if (d && Math.abs(p.x - (d.x + d.w)) <= HANDLE && Math.abs(p.y - (d.y + d.h)) <= HANDLE) {
+          pick = k; mode = "resize"; break;
+        }
+      }
+      // Else the smallest box under the pointer (so subtext beats heading).
+      if (!pick) {
+        let bestArea = Infinity;
+        for (const k of els) {
+          const d = dispRect(k);
+          if (d && p.x >= d.x && p.x <= d.x + d.w && p.y >= d.y && p.y <= d.y + d.h) {
+            const a = d.w * d.h;
+            if (a < bestArea) { bestArea = a; pick = k; mode = "move"; }
+          }
+        }
+      }
+      if (!pick) return;
+      activeEl = pick;
+      const t = tf(pick);
+      const d = dispRect(pick);
       drag = {
-        mode: onHandle ? "resize" : "move",
+        key: pick, mode,
         startX: p.x, startY: p.y,
-        dx: tf.dx, dy: tf.dy, scale: tf.scale,
+        dx: t.dx, dy: t.dy, scale: t.scale,
         cx: d.cx, cy: d.cy,
         startDist: Math.hypot(p.x - d.cx, p.y - d.cy)
       };
       try { canvas.setPointerCapture(e.pointerId); } catch (_) {}
+      renderEditFrame();
       e.preventDefault();
     });
 
     canvas.addEventListener("pointermove", (e) => {
       if (!drag) return;
       const p = toCanvasCoords(e);
-      const tf = transform[editKey];
+      const t = tf(drag.key);
       if (drag.mode === "move") {
-        tf.dx = drag.dx + (p.x - drag.startX);
-        tf.dy = drag.dy + (p.y - drag.startY);
+        t.dx = drag.dx + (p.x - drag.startX);
+        t.dy = drag.dy + (p.y - drag.startY);
       } else {
         const dist = Math.hypot(p.x - drag.cx, p.y - drag.cy);
         const ratio = drag.startDist > 12 ? dist / drag.startDist : 1;
-        tf.scale = Math.max(0.3, Math.min(4, drag.scale * ratio));
+        t.scale = Math.max(0.3, Math.min(4, drag.scale * ratio));
       }
       renderEditFrame();
       e.preventDefault();
