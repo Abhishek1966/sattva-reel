@@ -2331,7 +2331,7 @@
       // square. Leave a clear gap so the text never touches the mark.
       const tx = mode === "badge" ? x + markW + 16 : x + markW * 0.94;
       const textColor = mode === "sage" ? "#234c39" : "#ffffff";
-      const baseline = y + markH * 0.5;
+      const baseline = y + markH * 0.46;
 
       ctx.textAlign = "left";
       ctx.textBaseline = "alphabetic";
@@ -2347,7 +2347,7 @@
       ctx.globalAlpha = 0.9;
       ctx.font = "500 15px 'JetBrains Mono', ui-monospace, monospace";
       if ("letterSpacing" in ctx) ctx.letterSpacing = "3px";
-      ctx.fillText("YOUR GUT, YOUR WAY", tx + 2, baseline + 23);
+      ctx.fillText("YOUR GUT, YOUR WAY", tx + 2, y + markH - 8);
       if ("letterSpacing" in ctx) ctx.letterSpacing = "0px";
       ctx.restore();
     }
