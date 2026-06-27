@@ -1426,6 +1426,7 @@
                 <select id="textBg">
                   <option value="off" selected>Off</option>
                   <option value="gold">Gold box (#78561a)</option>
+                  <option value="terracotta">Terracotta box</option>
                   <option value="black">Black box</option>
                   <option value="white">White box</option>
                 </select>
@@ -2334,7 +2335,7 @@
 
     function drawSattvaFrame() {
       ctx.save();
-      ctx.strokeStyle = "rgba(246,239,229,0.46)";
+      ctx.strokeStyle = "rgba(20,17,12,0.62)";
       ctx.lineWidth = 3;
       ctx.strokeRect(36, 36, W - 72, H - 72);
       ctx.restore();
@@ -2441,6 +2442,7 @@
       return {
         off: null,
         gold: "#78561a",
+        terracotta: "#b85a3a",
         black: "rgba(20,17,12,0.82)",
         white: "rgba(245,239,229,0.94)"
       }[fields.textBg.value] || null;

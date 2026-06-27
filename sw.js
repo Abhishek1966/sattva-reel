@@ -1,4 +1,4 @@
-const CACHE = "sattva-reel-v5";
+const CACHE = "sattva-reel-v6";
 const ASSETS = [
   "./",
   "./index.html",
@@ -22,7 +22,7 @@ self.addEventListener("activate", (event) => {
   );
 });
 
-// Cache-first with runtime caching (covers Google Fonts too) ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â offline-capable.
+// Cache-first with runtime caching (covers Google Fonts too) ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚Â offline-capable.
 self.addEventListener("fetch", (event) => {
   const req = event.request;
   if (req.method !== "GET") return;
