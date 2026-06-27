@@ -1364,15 +1364,18 @@
               </label>
               <label>Text Style
                 <select id="textAnimation">
-                  <option value="typewriter" selected>Typewriter</option>
+                  <option value="none" selected>Instant (no animation)</option>
+                  <option value="typewriter">Typewriter</option>
                   <option value="popup">Pop-up</option>
                 </select>
               </label>
               <label>Readability Overlay
                 <select id="overlayStrength">
+                  <option value="subtle">Subtle</option>
                   <option value="medium">Medium</option>
-                  <option value="strong" selected>Strong</option>
-                  <option value="extra">Extra</option>
+                  <option value="strong">Strong</option>
+                  <option value="heavy" selected>Heavy</option>
+                  <option value="max">Max</option>
                 </select>
               </label>
               <label>Brand Handle
@@ -2170,10 +2173,12 @@
 
     function drawOverlays(sceneKey, progress) {
       const strength = {
-        medium: { bottom: 0.84, scene: 0.52 },
-        strong: { bottom: 0.9, scene: 0.62 },
-        extra: { bottom: 0.94, scene: 0.72 }
-      }[fields.overlayStrength.value] || { bottom: 0.9, scene: 0.62 };
+        subtle: { bottom: 0.55, scene: 0.30 },
+        medium: { bottom: 0.78, scene: 0.48 },
+        strong: { bottom: 0.90, scene: 0.62 },
+        heavy:  { bottom: 0.97, scene: 0.80 },
+        max:    { bottom: 1.00, scene: 0.92 }
+      }[fields.overlayStrength.value] || { bottom: 0.97, scene: 0.80 };
 
       const top = ctx.createLinearGradient(0, 0, 0, H);
       top.addColorStop(0, "rgba(53,42,31,0.28)");
@@ -2183,10 +2188,11 @@
       ctx.fillStyle = top;
       ctx.fillRect(0, 0, W, H);
 
-      if (sceneKey !== "hook") {
-        ctx.fillStyle = "rgba(53,42,31," + strength.scene + ")";
-        ctx.fillRect(0, 0, W, H);
-      }
+      // Flat scrim behind body text. Hook gets a lighter scrim so the
+      // image still reads; beats get the full scene strength.
+      const flat = sceneKey === "hook" ? strength.scene * 0.5 : strength.scene;
+      ctx.fillStyle = "rgba(53,42,31," + flat + ")";
+      ctx.fillRect(0, 0, W, H);
 
       ctx.save();
       ctx.globalAlpha = 0.16;
@@ -2309,6 +2315,7 @@
 
     function typeTextTimed(text, elapsedMs, startMs) {
       const normalized = String(text || "");
+      if (fields.textAnimation.value === "none") return normalized;
       if (fields.textAnimation.value === "popup") return elapsedMs >= startMs ? normalized : "";
       const elapsedTypingMs = Math.max(0, elapsedMs - startMs);
       const count = Math.ceil(elapsedTypingMs / 1000 * currentSpeed().cps);
@@ -2380,8 +2387,8 @@
       const subText = hasSubline ? typeTextTimed(sublineText, elapsedMs, subStart) : "";
       const hookMaxWidth = W - 140;
       const subMaxWidth = W - 150;
-      const hook = fitFont(hookText, 78, 38, hookMaxWidth, hFont, 5);
-      const sub = hasSubline ? fitFont(subText, 40, 24, subMaxWidth, bFont, 5) : null;
+      const hook = fitFont(hookText, 78, 26, hookMaxWidth, hFont, 8);
+      const sub = hasSubline ? fitFont(subText, 40, 18, subMaxWidth, bFont, 8) : null;
       const hookReveal = textReveal(elapsedMs, hookStart);
       const subReveal = hasSubline ? textReveal(elapsedMs, subStart) : { alpha: 0, scale: 1, y: 0 };
       const hookHeight = hook.lines.length * hook.size * 1.08;
@@ -2428,9 +2435,9 @@
       const labelMaxWidth = W - 150;
       const hookMaxWidth = W - 150;
       const subMaxWidth = W - 170;
-      const fittedLabel = fitFont(labelText, 94, 44, labelMaxWidth, hFont, 2);
-      const fitted = fitFont(typed, key === "beat2" ? 62 : 58, 30, hookMaxWidth, hFont, 4);
-      const fittedSubtext = hasSubtext ? fitFont(typedSubtext, 34, 20, subMaxWidth, bFont, 6) : null;
+      const fittedLabel = fitFont(labelText, 94, 34, labelMaxWidth, hFont, 3);
+      const fitted = fitFont(typed, key === "beat2" ? 62 : 58, 22, hookMaxWidth, hFont, 8);
+      const fittedSubtext = hasSubtext ? fitFont(typedSubtext, 34, 15, subMaxWidth, bFont, 9) : null;
       const reveal = easeOutCubic(progress);
       const hookReveal = textReveal(elapsedMs, hookStart);
       const subReveal = hasSubtext ? textReveal(elapsedMs, subStart) : { alpha: 0, scale: 1, y: 0 };
