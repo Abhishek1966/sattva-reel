@@ -1198,9 +1198,15 @@
             <div class="bulk-upload-row">
               <label class="button secondary bulk-label" for="bulkUpload">Upload All 5</label>
               <input id="bulkUpload" type="file" accept="image/*" multiple style="display:none">
-              <label class="button secondary bulk-label" for="logoImage">Upload Logo</label>
-              <input id="logoImage" type="file" accept="image/*" style="display:none">
             </div>
+            <label>Watermark
+              <select id="watermark">
+                <option value="white" selected>White mark</option>
+                <option value="sage">Sage mark</option>
+                <option value="badge">Badge (green)</option>
+                <option value="none">None</option>
+              </select>
+            </label>
             <div class="image-slots" id="imageSlots"></div>
             <div class="status">Upload All assigns left-to-right: Hook → Beat 1 → 2 → 3 → 4.</div>
             <div class="next-step-hint">
@@ -1802,6 +1808,7 @@
       ctaSubtext: document.getElementById("ctaSubtext"),
       handle: document.getElementById("handle"),
       imageFit: document.getElementById("imageFit"),
+      watermark: document.getElementById("watermark"),
       textBg: document.getElementById("textBg"),
       textSize: document.getElementById("textSize"),
       textSpeed: document.getElementById("textSpeed"),
@@ -2079,13 +2086,6 @@
     });
 
     // Logo upload
-    document.getElementById("logoImage").addEventListener("change", function () {
-      const file = this.files && this.files[0];
-      if (!file) return;
-      loadImageFile(file, "logo", null);
-      this.value = "";
-    });
-
     // Initial render
     renderSlots();
 
@@ -2303,59 +2303,105 @@
       ctx.restore();
     }
 
+    // Sattva watermark: vector figure mark + "Sattva" + tagline, bottom-left.
     function drawBrand() {
-      if (imageState.logo) { drawLogoImage(); return; }
+      const mode = (fields.watermark && fields.watermark.value) || "white";
+      if (mode === "none") return;
+
+      const markH = 116;
+      const x = 64;
+      const y = H - markH - 64;
+
+      drawSattvaMark(x, y, markH, mode);
+
+      const textColor = mode === "sage" ? "#234c39" : "#ffffff";
+      const tx = x + markH + 26;
+      const sattvaBaseline = y + markH * 0.54;
+
       ctx.save();
-      ctx.translate(76, H - 118);
-      ctx.globalAlpha = 0.58;
-      ctx.shadowColor = "rgba(53,42,31,0.18)";
-      ctx.shadowBlur = 8;
-      ctx.shadowOffsetY = 2;
-      drawSiteLeaf(0, -28, 48, "#9fca8b");
-      ctx.fillStyle = "#2f6f4d";
-      ctx.font = "700 44px Georgia, serif";
-      ctx.textBaseline = "middle";
       ctx.textAlign = "left";
-      ctx.fillText("Sattva", 60, 0);
+      ctx.textBaseline = "alphabetic";
+      ctx.shadowColor = mode === "sage" ? "rgba(246,239,229,0.5)" : "rgba(20,17,12,0.4)";
+      ctx.shadowBlur = 12;
+      ctx.shadowOffsetY = 2;
+      ctx.fillStyle = textColor;
+      ctx.font = "700 60px 'Fraunces', Georgia, serif";
+      ctx.fillText("Sattva", tx, sattvaBaseline);
+
+      ctx.shadowBlur = 6;
+      ctx.fillStyle = textColor;
+      ctx.globalAlpha = mode === "sage" ? 0.82 : 0.9;
+      ctx.font = "500 20px 'JetBrains Mono', ui-monospace, monospace";
+      if ("letterSpacing" in ctx) ctx.letterSpacing = "5px";
+      ctx.fillText("YOUR GUT, YOUR WAY", tx + 2, sattvaBaseline + 32);
+      if ("letterSpacing" in ctx) ctx.letterSpacing = "0px";
       ctx.restore();
     }
 
-    function drawSiteLeaf(x, y, size, color) {
-      const s = size / 24;
+    // Vector figure mark (head + body + gut coil) at (x,y) with given height.
+    // mode: "white" | "sage" | "badge".
+    function drawSattvaMark(x, y, size, mode) {
+      const s = size / 100;
       ctx.save();
       ctx.translate(x, y);
       ctx.scale(s, s);
-      ctx.strokeStyle = color;
-      ctx.lineWidth = 2.2;
-      ctx.lineCap = "round";
-      ctx.lineJoin = "round";
-      ctx.fillStyle = "rgba(159,202,139,0.16)";
+
+      if (mode === "badge") {
+        ctx.save();
+        ctx.shadowColor = "rgba(20,17,12,0.32)";
+        ctx.shadowBlur = 14;
+        ctx.shadowOffsetY = 4;
+        ctx.fillStyle = "#2f5d45";
+        ctx.beginPath();
+        ctx.roundRect(0, 0, 100, 100, 24);
+        ctx.fill();
+        ctx.restore();
+      }
+
+      const figFill = mode === "sage" ? "#2f5d45" : "#ffffff";
+      if (mode !== "badge") {
+        ctx.shadowColor = "rgba(20,17,12,0.28)";
+        ctx.shadowBlur = 10;
+        ctx.shadowOffsetY = 3;
+      }
+      ctx.fillStyle = figFill;
+      // head
       ctx.beginPath();
-      ctx.moveTo(11, 20);
-      ctx.bezierCurveTo(6.8, 20, 4, 17.1, 4, 13.1);
-      ctx.bezierCurveTo(4, 8.8, 7.1, 6.5, 11.2, 5.9);
-      ctx.bezierCurveTo(15.4, 5.3, 17.4, 3.7, 20, 2);
-      ctx.bezierCurveTo(21, 4.4, 22, 7, 22, 10.5);
-      ctx.bezierCurveTo(22, 16, 17.7, 20, 11, 20);
+      ctx.arc(50, 24, 13, 0, Math.PI * 2);
+      ctx.fill();
+      // body
+      ctx.beginPath();
+      ctx.moveTo(23, 84);
+      ctx.bezierCurveTo(23, 53, 35, 40, 50, 40);
+      ctx.bezierCurveTo(65, 40, 77, 53, 77, 84);
+      ctx.bezierCurveTo(77, 87, 67, 88, 50, 88);
+      ctx.bezierCurveTo(33, 88, 23, 87, 23, 84);
       ctx.closePath();
       ctx.fill();
-      ctx.stroke();
-      ctx.beginPath();
-      ctx.moveTo(2, 21);
-      ctx.bezierCurveTo(4.8, 17.4, 8.6, 15.2, 13, 12);
-      ctx.stroke();
-      ctx.restore();
-    }
 
-    function drawLogoImage() {
-      const img = imageState.logo;
-      const maxW = 250, maxH = 92;
-      const ratio = img.width / img.height;
-      let dw = maxW, dh = dw / ratio;
-      if (dh > maxH) { dh = maxH; dw = dh * ratio; }
-      ctx.save();
-      ctx.globalAlpha = 0.96;
-      ctx.drawImage(img, 76, H - 172, dw, dh);
+      // gut coil — vertical blue→orange→brown gradient
+      ctx.shadowColor = "transparent";
+      ctx.shadowBlur = 0;
+      ctx.shadowOffsetY = 0;
+      const g = ctx.createLinearGradient(0, 56, 0, 78);
+      g.addColorStop(0, "#6f96b8");
+      g.addColorStop(0.5, "#c2683f");
+      g.addColorStop(1, "#8a5a33");
+      ctx.strokeStyle = g;
+      ctx.lineWidth = 4.6;
+      ctx.lineCap = "round";
+      ctx.lineJoin = "round";
+      ctx.beginPath();
+      ctx.moveTo(45, 57);
+      ctx.lineTo(54, 57);
+      ctx.quadraticCurveTo(59, 57, 59, 61.5);
+      ctx.quadraticCurveTo(59, 66, 54, 66);
+      ctx.lineTo(46, 66);
+      ctx.quadraticCurveTo(41, 66, 41, 70.5);
+      ctx.quadraticCurveTo(41, 75, 46, 75);
+      ctx.lineTo(55, 75);
+      ctx.stroke();
+
       ctx.restore();
     }
 
