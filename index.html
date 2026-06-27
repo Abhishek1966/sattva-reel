@@ -2327,23 +2327,24 @@
       ctx.save();
       ctx.drawImage(img, x, y, markW, markH);
 
-      // Transparent figure marks have inner padding, so tuck text in closer;
-      // the badge fills its square, so sit text just outside it.
-      const tx = mode === "badge" ? x + markW + 10 : x + markW * 0.78;
+      // Transparent figure marks have inner padding; the badge fills its
+      // square. Leave a clear gap so the text never touches the mark.
+      const tx = mode === "badge" ? x + markW + 16 : x + markW * 0.94;
       const textColor = mode === "sage" ? "#234c39" : "#ffffff";
       const baseline = y + markH * 0.5;
 
       ctx.textAlign = "left";
       ctx.textBaseline = "alphabetic";
-      ctx.shadowColor = mode === "sage" ? "rgba(246,239,229,0.55)" : "rgba(20,17,12,0.5)";
-      ctx.shadowBlur = 10;
-      ctx.shadowOffsetY = 2;
+      // One subtle dark shadow for all modes (no pale halo / emboss).
+      ctx.shadowColor = "rgba(20,17,12,0.35)";
+      ctx.shadowBlur = 6;
+      ctx.shadowOffsetX = 0;
+      ctx.shadowOffsetY = 1;
       ctx.fillStyle = textColor;
       ctx.font = "700 44px 'Fraunces', Georgia, serif";
       ctx.fillText("Sattva", tx, baseline);
 
-      ctx.shadowBlur = 5;
-      ctx.globalAlpha = mode === "sage" ? 0.85 : 0.92;
+      ctx.globalAlpha = 0.9;
       ctx.font = "500 15px 'JetBrains Mono', ui-monospace, monospace";
       if ("letterSpacing" in ctx) ctx.letterSpacing = "3px";
       ctx.fillText("YOUR GUT, YOUR WAY", tx + 2, baseline + 23);
