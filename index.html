@@ -1199,14 +1199,23 @@
               <label class="button secondary bulk-label" for="bulkUpload">Upload All 5</label>
               <input id="bulkUpload" type="file" accept="image/*" multiple style="display:none">
             </div>
-            <label>Watermark
-              <select id="watermark">
-                <option value="white" selected>White mark</option>
-                <option value="sage">Sage mark</option>
-                <option value="badge">Badge (green)</option>
-                <option value="none">None</option>
-              </select>
-            </label>
+            <div class="grid-2">
+              <label>Watermark
+                <select id="watermark">
+                  <option value="white" selected>White mark</option>
+                  <option value="sage">Sage mark</option>
+                  <option value="badge">Badge (green)</option>
+                  <option value="none">None</option>
+                </select>
+              </label>
+              <label>Watermark Position
+                <select id="watermarkPos">
+                  <option value="left" selected>Left</option>
+                  <option value="center">Center</option>
+                  <option value="right">Right</option>
+                </select>
+              </label>
+            </div>
             <div class="image-slots" id="imageSlots"></div>
             <div class="status">Upload All assigns left-to-right: Hook → Beat 1 → 2 → 3 → 4.</div>
             <div class="next-step-hint">
@@ -1817,6 +1826,7 @@
       handle: document.getElementById("handle"),
       imageFit: document.getElementById("imageFit"),
       watermark: document.getElementById("watermark"),
+      watermarkPos: document.getElementById("watermarkPos"),
       textBg: document.getElementById("textBg"),
       textSize: document.getElementById("textSize"),
       textSpeed: document.getElementById("textSpeed"),
@@ -2321,15 +2331,30 @@
       const markH = 104;
       const ar = img.naturalWidth / img.naturalHeight;
       const markW = markH * ar;
-      const x = 60;
       const y = H - markH - 60;
-
-      ctx.save();
-      ctx.drawImage(img, x, y, markW, markH);
 
       // Transparent figure marks have inner padding; the badge fills its
       // square. Leave a clear gap so the text never touches the mark.
-      const tx = mode === "badge" ? x + markW + 16 : x + markW * 0.94;
+      const textStart = mode === "badge" ? markW + 16 : markW * 0.94;
+
+      ctx.save();
+      // Measure the lockup width to honour the chosen position.
+      ctx.font = "700 44px 'Fraunces', Georgia, serif";
+      const sattvaW = ctx.measureText("Sattva").width;
+      ctx.font = "500 15px 'JetBrains Mono', ui-monospace, monospace";
+      if ("letterSpacing" in ctx) ctx.letterSpacing = "3px";
+      const tagW = ctx.measureText("YOUR GUT, YOUR WAY").width;
+      if ("letterSpacing" in ctx) ctx.letterSpacing = "0px";
+      const lockupW = textStart + Math.max(sattvaW, tagW);
+
+      const pos = (fields.watermarkPos && fields.watermarkPos.value) || "left";
+      const margin = 60;
+      let x = margin;
+      if (pos === "center") x = (W - lockupW) / 2;
+      else if (pos === "right") x = W - margin - lockupW;
+
+      ctx.drawImage(img, x, y, markW, markH);
+      const tx = x + textStart;
       const textColor = mode === "sage" ? "#234c39" : "#ffffff";
       // Visible figure bottom: ~80% of the box for the padded transparent
       // marks, full square for the badge. Align the tagline baseline to it.
