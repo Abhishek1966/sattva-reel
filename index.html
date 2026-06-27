@@ -1836,8 +1836,10 @@
 
     // Per-ELEMENT resizable text box (move + reshape; text reflows to fit).
     // Keys: "hook","subline", and per beat: "<key>Label","<key>","<key>Sub".
-    const boxes = {};        // override box {x,y,w,h} in canvas coords (when user-edited)
-    const naturalRect = {};  // auto-layout rect for the current frame (default when no box)
+    const boxes = {};        // reel (9:16) box overrides {x,y,w,h}
+    const boxesPost = {};    // post (4:5) box overrides {x,y,w,h}
+    let activeBoxes = boxes; // box set used by the current render pass
+    const naturalRect = {};  // auto-layout rect for the current frame
     let editMode = false;
     let editKey = "hook";        // the scene being edited
     let activeEl = null;         // the element currently selected/dragged
@@ -2443,7 +2445,7 @@
       let x = o.x, y = o.y, w = o.maxW;
       let font = o.natFit.font, lines = o.natFit.lines, lineH = o.natFit.size * o.lineFactor;
 
-      const b = boxes[o.key];
+      const b = activeBoxes[o.key];
       if (b) {
         // Size font from the FULL text (stable), then wrap the typed text at it.
         const fb = fitFontBox(o.fullText, b.w, b.h, o.fontFamily, o.lineFactor);
@@ -2698,6 +2700,7 @@
     }
 
     function draw(ms) {
+      activeBoxes = boxes;
       const scene = getScene(ms);
       const progress = sceneProgress(scene, ms);
       const elapsedMs = ms - scene.start;
@@ -2745,10 +2748,11 @@
       const off = document.createElement("canvas");
       off.width = 1080;
       off.height = 1350;
-      const prevCtx = ctx, prevW = W, prevH = H;
+      const prevCtx = ctx, prevW = W, prevH = H, prevBoxes = activeBoxes;
       ctx = off.getContext("2d");
       W = off.width;
       H = off.height;
+      activeBoxes = boxesPost;
       try {
         const img = selectedImage(sceneKey);
         const SETTLED = 1e7; // large elapsed → full text, reveal complete
@@ -2772,6 +2776,7 @@
         ctx = prevCtx;
         W = prevW;
         H = prevH;
+        activeBoxes = prevBoxes;
       }
       return off;
     }
@@ -2829,8 +2834,12 @@
       return sceneKey === "cta" ? "beat4" : sceneKey;
     }
 
+    // Edit acts on whichever mode is being previewed.
+    function editBoxes() { return previewMode === "post" ? boxesPost : boxes; }
+    function currentScene() { return previewMode === "post" ? postScene : editKey; }
+
     function dispRect(key) {
-      const r = boxes[key] || naturalRect[key];
+      const r = editBoxes()[key] || naturalRect[key];
       if (!r) return null;
       return { x: r.x, y: r.y, w: r.w, h: r.h };
     }
@@ -2871,31 +2880,34 @@
     }
 
     function renderEditFrame() {
-      const s = scenes.find((x) => x.key === sceneRenderKey(editKey)) || scenes[0];
-      draw(s.start + (s.end - s.start) * 0.95);
-      drawEditHandles(editKey);
+      if (previewMode === "post") {
+        renderPostPreview();
+      } else {
+        const s = scenes.find((x) => x.key === sceneRenderKey(editKey)) || scenes[0];
+        draw(s.start + (s.end - s.start) * 0.95);
+      }
+      drawEditHandles(currentScene());
     }
 
     function setEdit(on) {
       editMode = on;
       editToggle.textContent = on ? "Done" : "Move / Resize Text";
       editToggle.classList.toggle("is-done", on);
-      editScene.hidden = !on;
+      editScene.hidden = !on || previewMode === "post"; // post uses its own scene picker
       editReset.hidden = !on;
       editStatus.hidden = !on;
       canvas.style.touchAction = on ? "none" : "";
       canvas.style.cursor = on ? "move" : "";
       if (on) renderEditFrame();
+      else if (previewMode === "post") renderPostPreview();
       else loopStart = performance.now();
     }
 
-    editToggle.addEventListener("click", () => {
-      if (previewMode === "post") setPreviewMode("reel");
-      setEdit(!editMode);
-    });
+    editToggle.addEventListener("click", () => setEdit(!editMode));
     editScene.addEventListener("change", () => { editKey = editScene.value; activeEl = null; renderEditFrame(); });
     editReset.addEventListener("click", () => {
-      sceneElements(editKey).forEach((k) => { delete boxes[k]; });
+      const bset = editBoxes();
+      sceneElements(currentScene()).forEach((k) => { delete bset[k]; });
       activeEl = null;
       renderEditFrame();
     });
@@ -2912,8 +2924,9 @@
     let drag = null;
     canvas.addEventListener("pointerdown", (e) => {
       if (!editMode) return;
+      const bset = editBoxes();
       const p = toCanvasCoords(e);
-      const els = sceneElements(editKey).filter((k) => boxes[k] || naturalRect[k]);
+      const els = sceneElements(currentScene()).filter((k) => bset[k] || naturalRect[k]);
       let pick = null, edge = null;
       // Prefer a resize edge/corner of any element.
       for (const k of els) {
@@ -2935,8 +2948,8 @@
       if (!pick) return;
       activeEl = pick;
       // Seed a box override from the current rect if none yet.
-      if (!boxes[pick]) { const d = dispRect(pick); boxes[pick] = { x: d.x, y: d.y, w: d.w, h: d.h }; }
-      const b = boxes[pick];
+      if (!bset[pick]) { const d = dispRect(pick); bset[pick] = { x: d.x, y: d.y, w: d.w, h: d.h }; }
+      const b = bset[pick];
       drag = { key: pick, edge, startX: p.x, startY: p.y, box: { x: b.x, y: b.y, w: b.w, h: b.h } };
       try { canvas.setPointerCapture(e.pointerId); } catch (_) {}
       renderEditFrame();
@@ -2946,7 +2959,7 @@
     canvas.addEventListener("pointermove", (e) => {
       if (!drag) return;
       const p = toCanvasCoords(e);
-      const b = boxes[drag.key];
+      const b = editBoxes()[drag.key];
       const s = drag.box;
       const dx = p.x - drag.startX, dy = p.y - drag.startY;
       if (!drag.edge) {
@@ -2995,11 +3008,11 @@
       modePost.classList.toggle("is-done", mode === "post");
       postSceneSel.hidden = mode !== "post";
       stageEl.classList.toggle("post", mode === "post");
+      activeEl = null;
+      editScene.hidden = !editMode || mode === "post";
       if (mode === "post") {
-        if (editMode) setEdit(false);
         canvas.width = 1080; canvas.height = 1350;
         previewMetaText.textContent = "Post preview · 1080×1350 · " + POST_LABELS[postScene];
-        renderPostPreview();
       } else {
         canvas.width = 1080; canvas.height = 1920;
         previewMetaText.innerHTML = 'Live 1080×1920 preview · <span id="previewDuration">' +
@@ -3007,17 +3020,23 @@
         fields.previewDuration = document.getElementById("previewDuration");
         loopStart = performance.now();
       }
+      if (editMode) renderEditFrame();
+      else if (mode === "post") renderPostPreview();
     }
 
     modeReel.addEventListener("click", () => setPreviewMode("reel"));
     modePost.addEventListener("click", () => setPreviewMode("post"));
     postSceneSel.addEventListener("change", () => {
       postScene = postSceneSel.value;
+      activeEl = null;
       previewMetaText.textContent = "Post preview · 1080×1350 · " + POST_LABELS[postScene];
-      renderPostPreview();
+      if (editMode) renderEditFrame(); else renderPostPreview();
     });
-    // Keep the post preview live as fields change.
-    document.addEventListener("input", () => { if (previewMode === "post") renderPostPreview(); });
+    // Keep the preview live as fields change.
+    document.addEventListener("input", () => {
+      if (editMode) renderEditFrame();
+      else if (previewMode === "post") renderPostPreview();
+    });
 
     // ── AI Helper ─────────────────────────────────────────
     function makePrompt() {
