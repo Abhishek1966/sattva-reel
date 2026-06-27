@@ -885,6 +885,18 @@
     .edit-bar .button { flex: 1; min-height: 42px; padding: 10px 12px; }
     .edit-bar select { flex: 1; }
 
+    .preview-switch {
+      display: flex;
+      gap: 8px;
+      width: 100%;
+      max-width: 360px;
+    }
+
+    .preview-switch .button { flex: 1; min-height: 40px; padding: 9px 10px; }
+    .preview-switch select { flex: 1; }
+
+    .stage.post { aspect-ratio: 4 / 5; }
+
     .export-card {
       width: 100%;
       max-width: 360px;
@@ -1119,7 +1131,8 @@
       .preview-pane .stage-wrap::before { content: none; }
       .preview-pane .stage { width: 100%; max-width: 412px; border-radius: 18px; }
       .preview-pane .export-card,
-      .preview-pane .edit-card { max-width: 412px; }
+      .preview-pane .edit-card,
+      .preview-pane .preview-switch { max-width: 412px; }
 
       .current-section { display: none; }
     }
@@ -1529,10 +1542,21 @@
     <!-- Live preview — persistent pane on desktop, a tab on mobile -->
     <section class="tab-panel preview-pane" data-tab="preview" aria-label="Preview">
       <div class="stage-wrap">
+        <div class="preview-switch">
+          <button class="button secondary is-done" id="modeReel" type="button">Reel · 9:16</button>
+          <button class="button secondary" id="modePost" type="button">Post · 4:5</button>
+          <select id="postScene" class="compact-select" hidden>
+            <option value="hook">Hook</option>
+            <option value="beat1">Beat 1</option>
+            <option value="beat2">Beat 2</option>
+            <option value="beat3">Beat 3</option>
+            <option value="cta">Beat 4 / CTA</option>
+          </select>
+        </div>
         <div class="stage">
           <canvas id="reel" width="1080" height="1920"></canvas>
         </div>
-        <div class="preview-meta"><span class="dot"></span><span>Live 1080×1920 preview · <span id="previewDuration">11.0</span>s loop</span></div>
+        <div class="preview-meta"><span class="dot"></span><span id="previewMetaText">Live 1080×1920 preview · <span id="previewDuration">11.0</span>s loop</span></div>
         <div class="edit-card">
           <div class="edit-bar">
             <button class="button secondary" id="editToggle" type="button">Move / Resize Text</button>
@@ -1817,6 +1841,8 @@
     let editMode = false;
     let editKey = "hook";        // the scene being edited
     let activeEl = null;         // the element currently selected/dragged
+    let previewMode = "reel";    // "reel" (9:16 loop) or "post" (4:5 static)
+    let postScene = "hook";      // which scene the post preview shows
 
     const COLORS = {
       earth: "#67523b",
@@ -2697,7 +2723,7 @@
     }
 
     function animate(now) {
-      if (!exportMode && !editMode) {
+      if (!exportMode && !editMode && previewMode !== "post") {
         const ms = (now - loopStart) % DURATION;
         draw(ms);
       }
@@ -2863,7 +2889,10 @@
       else loopStart = performance.now();
     }
 
-    editToggle.addEventListener("click", () => setEdit(!editMode));
+    editToggle.addEventListener("click", () => {
+      if (previewMode === "post") setPreviewMode("reel");
+      setEdit(!editMode);
+    });
     editScene.addEventListener("change", () => { editKey = editScene.value; activeEl = null; renderEditFrame(); });
     editReset.addEventListener("click", () => {
       sceneElements(editKey).forEach((k) => { delete boxes[k]; });
@@ -2945,6 +2974,50 @@
     }
     canvas.addEventListener("pointerup", endDrag);
     canvas.addEventListener("pointercancel", endDrag);
+
+    // ── Preview mode: Reel (9:16 loop) ⇄ Post (4:5 static) ──
+    const modeReel = document.getElementById("modeReel");
+    const modePost = document.getElementById("modePost");
+    const postSceneSel = document.getElementById("postScene");
+    const stageEl = document.querySelector(".stage");
+    const previewMetaText = document.getElementById("previewMetaText");
+    const POST_LABELS = { hook: "Hook", beat1: "Beat 1", beat2: "Beat 2", beat3: "Beat 3", cta: "Beat 4 / CTA" };
+
+    function renderPostPreview() {
+      const off = renderPostScene(postScene === "cta" ? "beat4" : postScene);
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.drawImage(off, 0, 0);
+    }
+
+    function setPreviewMode(mode) {
+      previewMode = mode;
+      modeReel.classList.toggle("is-done", mode === "reel");
+      modePost.classList.toggle("is-done", mode === "post");
+      postSceneSel.hidden = mode !== "post";
+      stageEl.classList.toggle("post", mode === "post");
+      if (mode === "post") {
+        if (editMode) setEdit(false);
+        canvas.width = 1080; canvas.height = 1350;
+        previewMetaText.textContent = "Post preview · 1080×1350 · " + POST_LABELS[postScene];
+        renderPostPreview();
+      } else {
+        canvas.width = 1080; canvas.height = 1920;
+        previewMetaText.innerHTML = 'Live 1080×1920 preview · <span id="previewDuration">' +
+          (DURATION / 1000).toFixed(1) + "</span>s loop";
+        fields.previewDuration = document.getElementById("previewDuration");
+        loopStart = performance.now();
+      }
+    }
+
+    modeReel.addEventListener("click", () => setPreviewMode("reel"));
+    modePost.addEventListener("click", () => setPreviewMode("post"));
+    postSceneSel.addEventListener("change", () => {
+      postScene = postSceneSel.value;
+      previewMetaText.textContent = "Post preview · 1080×1350 · " + POST_LABELS[postScene];
+      renderPostPreview();
+    });
+    // Keep the post preview live as fields change.
+    document.addEventListener("input", () => { if (previewMode === "post") renderPostPreview(); });
 
     // ── AI Helper ─────────────────────────────────────────
     function makePrompt() {
