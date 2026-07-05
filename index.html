@@ -2312,13 +2312,6 @@
         ctx.fillRect(0, 0, W, H);
       }
 
-      ctx.save();
-      ctx.globalAlpha = 0.16;
-      ctx.fillStyle = COLORS.paper;
-      ctx.beginPath();
-      ctx.arc(W - 90, 170, 250 + progress * 18, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.restore();
     }
 
     // Sattva watermark: actual mark image + "Sattva" + tagline, bottom-left.
