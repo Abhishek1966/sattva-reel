@@ -1500,9 +1500,10 @@
               <button class="button secondary" id="copyPrompt" type="button">Copy Claude JSON Prompt</button>
               <button class="button secondary" id="fillFields" type="button">Fill From JSON</button>
               <button class="button secondary" id="copyImagePrompts" type="button">Copy Image Prompts</button>
+              <button class="button secondary" id="copyVideoPrompts" type="button">Copy Video Prompts</button>
             </div>
             <label>AI JSON Response
-              <textarea id="aiResponse" placeholder='{"hook":"...","subline":"...","beat1Label":"...","beat1":"...","beat1Subtext":"...","beat2Label":"...","beat2":"...","beat2Subtext":"...","beat3Label":"...","beat3":"...","beat3Subtext":"...","beat4Label":"...","beat4":"...","beat4Subtext":"...","imagePromptHook":"...","imagePromptBeat1":"...","imagePromptBeat2":"...","imagePromptBeat3":"...","imagePromptBeat4":"...","caption":"...","hashtags":"..."}'></textarea>
+              <textarea id="aiResponse" placeholder='{"hook":"...","subline":"...","beat1Label":"...","beat1":"...","beat1Subtext":"...","beat2Label":"...","beat2":"...","beat2Subtext":"...","beat3Label":"...","beat3":"...","beat3Subtext":"...","beat4Label":"...","beat4":"...","beat4Subtext":"...","imagePromptHook":"...","imagePromptBeat1":"...","imagePromptBeat2":"...","imagePromptBeat3":"...","imagePromptBeat4":"...","videoPromptHook":"...","videoPromptBeat1":"...","videoPromptBeat2":"...","videoPromptBeat3":"...","videoPromptBeat4":"...","caption":"...","hashtags":"..."}'></textarea>
             </label>
             <div class="image-prompt-grid">
               <div class="image-prompt-row">
@@ -1512,10 +1513,22 @@
                 <button class="button secondary" type="button" data-copy-field="imagePromptHook">Copy</button>
               </div>
               <div class="image-prompt-row">
+                <label>Hook Video Prompt
+                  <textarea id="videoPromptHook" placeholder="Generated video prompt (shot/subject/action/setting only) for the hook..."></textarea>
+                </label>
+                <button class="button secondary" type="button" data-copy-video-field="videoPromptHook">Copy</button>
+              </div>
+              <div class="image-prompt-row">
                 <label>Beat 1 Image Prompt
                   <textarea id="imagePromptBeat1" placeholder="Generated image prompt for Beat 1..."></textarea>
                 </label>
                 <button class="button secondary" type="button" data-copy-field="imagePromptBeat1">Copy</button>
+              </div>
+              <div class="image-prompt-row">
+                <label>Beat 1 Video Prompt
+                  <textarea id="videoPromptBeat1" placeholder="Generated video prompt (shot/subject/action/setting only) for Beat 1..."></textarea>
+                </label>
+                <button class="button secondary" type="button" data-copy-video-field="videoPromptBeat1">Copy</button>
               </div>
               <div class="image-prompt-row">
                 <label>Beat 2 Image Prompt
@@ -1524,16 +1537,34 @@
                 <button class="button secondary" type="button" data-copy-field="imagePromptBeat2">Copy</button>
               </div>
               <div class="image-prompt-row">
+                <label>Beat 2 Video Prompt
+                  <textarea id="videoPromptBeat2" placeholder="Generated video prompt (shot/subject/action/setting only) for Beat 2..."></textarea>
+                </label>
+                <button class="button secondary" type="button" data-copy-video-field="videoPromptBeat2">Copy</button>
+              </div>
+              <div class="image-prompt-row">
                 <label>Beat 3 Image Prompt
                   <textarea id="imagePromptBeat3" placeholder="Generated image prompt for Beat 3..."></textarea>
                 </label>
                 <button class="button secondary" type="button" data-copy-field="imagePromptBeat3">Copy</button>
               </div>
               <div class="image-prompt-row">
+                <label>Beat 3 Video Prompt
+                  <textarea id="videoPromptBeat3" placeholder="Generated video prompt (shot/subject/action/setting only) for Beat 3..."></textarea>
+                </label>
+                <button class="button secondary" type="button" data-copy-video-field="videoPromptBeat3">Copy</button>
+              </div>
+              <div class="image-prompt-row">
                 <label>Beat 4 Image Prompt
                   <textarea id="imagePromptBeat4" placeholder="Generated image prompt for Beat 4 or CTA..."></textarea>
                 </label>
                 <button class="button secondary" type="button" data-copy-field="imagePromptBeat4">Copy</button>
+              </div>
+              <div class="image-prompt-row">
+                <label>Beat 4 Video Prompt
+                  <textarea id="videoPromptBeat4" placeholder="Generated video prompt (shot/subject/action/setting only) for Beat 4 or CTA..."></textarea>
+                </label>
+                <button class="button secondary" type="button" data-copy-video-field="videoPromptBeat4">Copy</button>
               </div>
             </div>
             <label>Caption Output
@@ -1841,6 +1872,11 @@
       imagePromptBeat2: document.getElementById("imagePromptBeat2"),
       imagePromptBeat3: document.getElementById("imagePromptBeat3"),
       imagePromptBeat4: document.getElementById("imagePromptBeat4"),
+      videoPromptHook: document.getElementById("videoPromptHook"),
+      videoPromptBeat1: document.getElementById("videoPromptBeat1"),
+      videoPromptBeat2: document.getElementById("videoPromptBeat2"),
+      videoPromptBeat3: document.getElementById("videoPromptBeat3"),
+      videoPromptBeat4: document.getElementById("videoPromptBeat4"),
       caption: document.getElementById("caption"),
       hashtags: document.getElementById("hashtags"),
       durationLabel: document.getElementById("durationLabel"),
@@ -3054,10 +3090,27 @@
     });
 
     // ── AI Helper ─────────────────────────────────────────
+    // Fixed rules applied to every AI video generation, appended automatically at copy time.
+    // Kept in one place so the whole account's video look can be updated without touching
+    // the per-beat prompt instructions below. Labeled lines match the AI-generated Shot/
+    // Subject/Action/Setting lines so the whole assembled prompt reads as one consistent,
+    // easy-to-scan block you can edit line-by-line inside Gemini.
+    const VIDEO_STYLE_CONSTANTS =
+      "Framing: reserve roughly the top 20% of the vertical frame calm and uncluttered, no key subject detail or motion up there, so text can be overlaid on it afterward — keep the main subject and action within the lower 80% of frame.\n" +
+      "Style: vertical 9:16 premium editorial wellness look, photorealistic, cinematic natural window light, shallow depth of field, bold but earthy contrast, earth brown, sage green, cream, burgundy, and turmeric gold color palette, soft botanical textures, calm gentle motion, no harsh cuts or transitions.\n" +
+      "Audio: no dialogue, no voiceover, no spoken words, soft calm ambient tone only.\n" +
+      "Avoid: on-screen text, captions, typography, subtitles, watermark, logos, UI graphics, distorted anatomy, extra limbs, scary clinical imagery, pills, needles, medical charts.";
+
+    function assembleVideoPrompt(variablesText) {
+      const variables = variablesText.trim();
+      if (!variables) return "";
+      return variables + "\n" + VIDEO_STYLE_CONSTANTS;
+    }
+
     function makePrompt() {
       const raw = fields.rawContent.value.trim();
       return "You are helping create a Sattva Instagram reel about Ayurveda, gut health, and IBS. This is the planning step only. Do NOT generate images in this response. " +
-        "Return ONLY a JSON object with these exact fields: hook, subline, beat1Label, beat1, beat1Subtext, beat2Label, beat2, beat2Subtext, beat3Label, beat3, beat3Subtext, beat4Label, beat4, beat4Subtext, imagePromptHook, imagePromptBeat1, imagePromptBeat2, imagePromptBeat3, imagePromptBeat4, caption, hashtags. Beat labels are optional and may be empty strings. " +
+        "Return ONLY a JSON object with these exact fields: hook, subline, beat1Label, beat1, beat1Subtext, beat2Label, beat2, beat2Subtext, beat3Label, beat3, beat3Subtext, beat4Label, beat4, beat4Subtext, imagePromptHook, imagePromptBeat1, imagePromptBeat2, imagePromptBeat3, imagePromptBeat4, videoPromptHook, videoPromptBeat1, videoPromptBeat2, videoPromptBeat3, videoPromptBeat4, caption, hashtags. Beat labels are optional and may be empty strings. " +
         "Keep hook and beats concise for a social reel. The template will extend timing for longer text, but shorter is still easier to read. Use warm, clear, science-aware language. " +
         "Avoid medical claims that sound like diagnosis or cure. Use Beat 4 as the closing mission or follow prompt. Return all hashtags in lowercase. " +
         "For imagePromptHook, imagePromptBeat1, imagePromptBeat2, imagePromptBeat3, and imagePromptBeat4, write five separate prompts that I can copy one at a time into an image generator. Each prompt must be complete and standalone, so it works without needing the other prompts. " +
@@ -3068,7 +3121,11 @@
         "Use this visual direction inside every image prompt: vertical 9:16 premium editorial wellness photograph, photorealistic, cinematic natural window light, shallow depth of field, bold but earthy contrast, Ayurvedic herbs or food or calm body-awareness imagery, earth brown, sage green, cream, burgundy, turmeric gold, and soft botanical textures. Leave generous clean negative space for overlaid reel text. " +
         "Prefer tactile close-ups, bowls, steam, herbs, fresh produce, fabric, sunlight, and ingredient-led scenes over generic stock-like wellness scenes. Avoid flat lay repetition unless the composition is unusually striking. " +
         "Each image prompt must say: no text, captions, typography, labels, logos, watermarks, UI graphics, medical charts, scary clinical imagery, pills, needles, or before/after claims. " +
-        "The five image prompts should feel like one consistent Sattva campaign, but each should show a different subject or scene.\n\n" +
+        "The five image prompts should feel like one consistent Sattva campaign, but each should show a different subject or scene. " +
+        "For videoPromptHook, videoPromptBeat1, videoPromptBeat2, videoPromptBeat3, and videoPromptBeat4, write five separate short AI-video prompts, one per reel section, so I can animate that section's core idea in Veo. " +
+        "Format the value of each of these five fields as EXACTLY four lines, in this order, each starting with its label and a colon, one short clear sentence per line, nothing else added: \\nShot: camera angle and any movement\\nSubject: precisely what is in frame\\nAction: exactly one clear motion or change happening (nothing static)\\nSetting: background or environment. " +
+        "Do NOT include color palette, lighting, visual style, framing/overlay-space notes, audio direction, or a negative prompt in these five fields — those are fixed separately in my app and will be appended automatically below your four lines, so repeating them would be redundant and would break the line-by-line format. " +
+        "Each video prompt must directly relate to that beat's raw content, not generic wellness motion, and each of the five must be visually distinct from the others. Across all five, no more than one may feature a person, hands, or any visible body part — the rest should be non-human motion (steam rising, herbs falling, liquid pouring, a bowl being stirred, an abstract gut-friendly metaphor, botanical texture moving) that keeps one clear, simple, loopable-feeling action. On the Subject line for any prompt, keep the description short and generic enough (e.g. \\\"a person\\\" rather than a detailed physical description) that I can easily swap it for a reference image or video of myself in Gemini if I choose to.\n\n" +
         "Raw content:\n" + raw + "\n\nReturn only the valid JSON object. Do not generate images in this response.";
     }
 
@@ -3085,6 +3142,24 @@
         .map(([label, key]) => {
           const value = fields[key].value.trim();
           return value ? label + " Image Prompt:\n" + value : "";
+        })
+        .filter(Boolean)
+        .join("\n\n");
+    }
+
+    const videoPromptFields = [
+      ["Hook", "videoPromptHook"],
+      ["Beat 1", "videoPromptBeat1"],
+      ["Beat 2", "videoPromptBeat2"],
+      ["Beat 3", "videoPromptBeat3"],
+      ["Beat 4", "videoPromptBeat4"]
+    ];
+
+    function videoPromptText() {
+      return videoPromptFields
+        .map(([label, key]) => {
+          const assembled = assembleVideoPrompt(fields[key].value);
+          return assembled ? label + " Video Prompt:\n" + assembled : "";
         })
         .filter(Boolean)
         .join("\n\n");
@@ -3144,6 +3219,40 @@
       }
     });
 
+    document.getElementById("copyVideoPrompts").addEventListener("click", async () => {
+      const button = document.getElementById("copyVideoPrompts");
+      const status = document.getElementById("aiStatus");
+      const text = videoPromptText();
+      if (!text) { status.textContent = "Fill or paste video prompts first."; return; }
+      try {
+        await navigator.clipboard.writeText(text);
+        showButtonFeedback(button, "Copied");
+        status.textContent = "Video prompts copied to clipboard, style/audio/negative rules included.";
+      } catch {
+        fields.aiResponse.value = text;
+        showButtonFeedback(button, "Ready to copy");
+        status.textContent = "Clipboard blocked. Video prompts placed in AI response box so you can copy them.";
+      }
+    });
+
+    document.querySelectorAll("[data-copy-video-field]").forEach((button) => {
+      button.addEventListener("click", async () => {
+        const status = document.getElementById("aiStatus");
+        const field = fields[button.dataset.copyVideoField];
+        const text = field ? assembleVideoPrompt(field.value) : "";
+        if (!text) { status.textContent = "Fill this video prompt first."; return; }
+        try {
+          await navigator.clipboard.writeText(text);
+          showButtonFeedback(button, "Copied");
+          status.textContent = "Video prompt copied, ready to paste into Gemini.";
+        } catch {
+          fields.aiResponse.value = text;
+          showButtonFeedback(button, "Ready");
+          status.textContent = "Clipboard blocked. Prompt placed in AI response box so you can copy it.";
+        }
+      });
+    });
+
     document.querySelectorAll("[data-copy-field]").forEach((button) => {
       button.addEventListener("click", async () => {
         const status = document.getElementById("aiStatus");
@@ -3190,9 +3299,20 @@
         Object.entries(promptValues).forEach(([key, value]) => {
           if (value && fields[key]) fields[key].value = value;
         });
+        const videoPrompts = data.videoPrompts && typeof data.videoPrompts === "object" ? data.videoPrompts : {};
+        const videoPromptValues = {
+          videoPromptHook: firstString(data.videoPromptHook, videoPrompts.hook, videoPrompts.hero, videoPrompts.intro),
+          videoPromptBeat1: firstString(data.videoPromptBeat1, videoPrompts.beat1),
+          videoPromptBeat2: firstString(data.videoPromptBeat2, videoPrompts.beat2),
+          videoPromptBeat3: firstString(data.videoPromptBeat3, videoPrompts.beat3),
+          videoPromptBeat4: firstString(data.videoPromptBeat4, videoPrompts.beat4, videoPrompts.cta)
+        };
+        Object.entries(videoPromptValues).forEach(([key, value]) => {
+          if (value && fields[key]) fields[key].value = value;
+        });
         updateTimeline();
         showButtonFeedback(button, "Filled");
-        status.textContent = "Fields and image prompts filled from JSON.";
+        status.textContent = "Fields, image prompts, and video prompts filled from JSON.";
       } catch {
         status.textContent = "Could not parse JSON. Check for extra text or invalid quotes.";
       }
