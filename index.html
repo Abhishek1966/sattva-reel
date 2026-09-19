@@ -20,7 +20,7 @@
   </script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;700&family=DM+Serif+Display&family=Fraunces:opsz,wght,SOFT@9..144,400;9..144,500;9..144,600;9..144,700;9..144,900;9..144,400..900&family=Inter:wght@500;700&family=JetBrains+Mono:wght@400;500&family=Lato:wght@700&family=Manrope:wght@400;500;600;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;700&family=DM+Serif+Display:ital@0;1&family=Fraunces:opsz,wght,SOFT@9..144,400;9..144,500;9..144,600;9..144,700;9..144,900;9..144,400..900&family=Inter:wght@400;500;700&family=JetBrains+Mono:wght@400;500&family=Lato:wght@700&family=Manrope:wght@400;500;600;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
   <style>
     :root {
       /* Dark premium Ayurvedic palette */
@@ -1451,7 +1451,7 @@
               <label>Brand Handle
                 <input id="handle" type="text" value="@sattvaibs">
               </label>
-              <label>Headline Font
+              <label>Headline Font <span class="sub" style="display:inline;font-size:11px">(reel only)</span>
                 <select id="headlineFont">
                   <option value="Georgia, serif">Georgia</option>
                   <option value="'Playfair Display', Georgia, serif">Playfair Display</option>
@@ -1461,7 +1461,7 @@
                   <option value="Lato, sans-serif">Lato</option>
                 </select>
               </label>
-              <label>Body Font
+              <label>Body Font <span class="sub" style="display:inline;font-size:11px">(reel only)</span>
                 <select id="bodyFont">
                   <option value="Menlo, Monaco, Consolas, monospace">Monospace</option>
                   <option value="Inter, sans-serif">Inter</option>
@@ -1469,6 +1469,7 @@
                   <option value="Georgia, serif">Georgia</option>
                 </select>
               </label>
+              <div class="sub">Posts lock typography: DM Serif Display · Manrope · Inter</div>
             </div>
             <label>Typing Speed
               <div class="slider-row">
@@ -1933,6 +1934,18 @@
 
     function bodyFontFamily() {
       return fields.bodyFont ? fields.bodyFont.value : "Menlo, Monaco, Consolas, monospace";
+    }
+
+    // Locked carousel / post typography — vary imagery & layout, not fonts.
+    const POST_TYPE = {
+      headline: { family: "'DM Serif Display', Georgia, serif", weight: "400" },
+      subhead:  { family: "'Manrope', sans-serif", weight: "500" },
+      body:     { family: "Inter, sans-serif", weight: "400" },
+      label:    { family: "'Manrope', sans-serif", weight: "700", letterSpacing: "0.14em" }
+    };
+
+    function usingPostType() {
+      return previewMode === "post" || activeBoxes === boxesPost;
     }
 
     // ── Speed ─────────────────────────────────────────────
@@ -2453,15 +2466,22 @@
       return select ? select.value : fallback;
     }
 
-    function fitFont(text, baseSize, minSize, maxWidth, fontFamily, maxLines) {
-      for (let size = baseSize; size >= minSize; size -= 2) {
-        const font = "700 " + size + "px " + fontFamily;
-        const lines = wrapText(text, maxWidth, font, maxLines);
-        const tooWide = lines.some((line) => ctx.measureText(line).width > maxWidth);
-        if (!tooWide && lines.length <= maxLines) return { size, font, lines };
+    function fitFont(text, baseSize, minSize, maxWidth, fontFamily, maxLines, weight, letterSpacing) {
+      const wgt = weight || "700";
+      const prevSpacing = "letterSpacing" in ctx ? ctx.letterSpacing : null;
+      if (letterSpacing && "letterSpacing" in ctx) ctx.letterSpacing = letterSpacing;
+      try {
+        for (let size = baseSize; size >= minSize; size -= 2) {
+          const font = wgt + " " + size + "px " + fontFamily;
+          const lines = wrapText(text, maxWidth, font, maxLines);
+          const tooWide = lines.some((line) => ctx.measureText(line).width > maxWidth);
+          if (!tooWide && lines.length <= maxLines) return { size, font, lines };
+        }
+        const font = wgt + " " + minSize + "px " + fontFamily;
+        return { size: minSize, font, lines: wrapText(text, maxWidth, font, maxLines) };
+      } finally {
+        if (letterSpacing && "letterSpacing" in ctx) ctx.letterSpacing = prevSpacing || "0px";
       }
-      const font = "700 " + minSize + "px " + fontFamily;
-      return { size: minSize, font, lines: wrapText(text, maxWidth, font, maxLines) };
     }
 
     function textSizeScale() {
@@ -2469,19 +2489,26 @@
     }
 
     // Largest font that fits text inside a box (wrap to width, total height <= maxH).
-    function fitFontBox(text, maxW, maxH, fontFamily, lineFactor) {
+    function fitFontBox(text, maxW, maxH, fontFamily, lineFactor, weight, letterSpacing) {
       const safeW = Math.max(20, maxW);
       const safeH = Math.max(16, maxH);
-      for (let size = 150; size >= 12; size -= 2) {
-        const font = "700 " + size + "px " + fontFamily;
-        ctx.font = font;
-        const lines = wrapText(text, safeW, font, 60);
-        const tooWide = lines.some((l) => ctx.measureText(l).width > safeW);
-        const totalH = lines.length * size * lineFactor;
-        if (!tooWide && totalH <= safeH) return { size, font, lines };
+      const wgt = weight || "700";
+      const prevSpacing = "letterSpacing" in ctx ? ctx.letterSpacing : null;
+      if (letterSpacing && "letterSpacing" in ctx) ctx.letterSpacing = letterSpacing;
+      try {
+        for (let size = 150; size >= 12; size -= 2) {
+          const font = wgt + " " + size + "px " + fontFamily;
+          ctx.font = font;
+          const lines = wrapText(text, safeW, font, 60);
+          const tooWide = lines.some((l) => ctx.measureText(l).width > safeW);
+          const totalH = lines.length * size * lineFactor;
+          if (!tooWide && totalH <= safeH) return { size, font, lines };
+        }
+        const font = wgt + " 12px " + fontFamily;
+        return { size: 12, font, lines: wrapText(text, safeW, font, 60) };
+      } finally {
+        if (letterSpacing && "letterSpacing" in ctx) ctx.letterSpacing = prevSpacing || "0px";
       }
-      const font = "700 12px " + fontFamily;
-      return { size: 12, font, lines: wrapText(text, safeW, font, 60) };
     }
 
     // Render one text element. Uses natural layout unless a user box override
@@ -2499,12 +2526,14 @@
       const b = activeBoxes[o.key];
       if (b) {
         // Size font from the FULL text (stable), then wrap the typed text at it.
-        const fb = fitFontBox(o.fullText, b.w, b.h, o.fontFamily, o.lineFactor);
+        const fb = fitFontBox(o.fullText, b.w, b.h, o.fontFamily, o.lineFactor, o.weight, o.letterSpacing);
         ctx.font = fb.font;
+        if (o.letterSpacing && "letterSpacing" in ctx) ctx.letterSpacing = o.letterSpacing;
         x = b.x; y = b.y; w = b.w;
         font = fb.font;
         lines = wrapText(o.text, b.w, fb.font, 60);
         lineH = fb.size * o.lineFactor;
+        if (o.letterSpacing && "letterSpacing" in ctx) ctx.letterSpacing = "0px";
       }
 
       ctx.save();
@@ -2514,9 +2543,11 @@
       ctx.shadowOffsetY = 3;
       ctx.fillStyle = o.color;
       ctx.font = font;
+      if (o.letterSpacing && "letterSpacing" in ctx) ctx.letterSpacing = o.letterSpacing;
       ctx.translate(x, y + (o.reveal ? o.reveal.y : 0));
       if (o.reveal && o.reveal.scale !== 1) ctx.scale(o.reveal.scale, o.reveal.scale);
       drawTextLines(lines, 0, 0, lineH, o.align, w);
+      if (o.letterSpacing && "letterSpacing" in ctx) ctx.letterSpacing = "0px";
       ctx.restore();
 
       return { x, y, w, font, lineHeight: lineH };
@@ -2629,8 +2660,11 @@
     }
 
     function drawHook(progress, elapsedMs) {
-      const hFont = headlineFontFamily();
-      const bFont = bodyFontFamily();
+      const post = usingPostType();
+      const hFont = post ? POST_TYPE.headline.family : headlineFontFamily();
+      const bFont = post ? POST_TYPE.subhead.family : bodyFontFamily();
+      const hWeight = post ? POST_TYPE.headline.weight : "700";
+      const bWeight = post ? POST_TYPE.subhead.weight : "700";
       const hookStart = 420;
       const sublineText = fields.subline.value;
       const hasSubline = sublineText.trim().length > 0;
@@ -2640,8 +2674,8 @@
       const hookMaxWidth = W - 140;
       const subMaxWidth = W - 150;
       const SZ = textSizeScale();
-      const hook = fitFont(hookText, 78 * SZ, 26 * SZ, hookMaxWidth, hFont, 8);
-      const sub = hasSubline ? fitFont(subText, 40 * SZ, 18 * SZ, subMaxWidth, bFont, 8) : null;
+      const hook = fitFont(hookText, 78 * SZ, 26 * SZ, hookMaxWidth, hFont, 8, hWeight);
+      const sub = hasSubline ? fitFont(subText, 40 * SZ, 18 * SZ, subMaxWidth, bFont, 8, bWeight) : null;
       const hookReveal = textReveal(elapsedMs, hookStart);
       const subReveal = hasSubline ? textReveal(elapsedMs, subStart) : { alpha: 0, scale: 1, y: 0 };
       const hookHeight = hook.lines.length * hook.size * 1.08;
@@ -2653,7 +2687,7 @@
       renderTextElement({
         key: "hook", text: hookText, fullText: fields.hook.value,
         natFit: hook, x: 72, y: startY, maxW: hookMaxWidth, lineFactor: 1.08,
-        align: textAlignFor("hook", "left"), fontFamily: hFont,
+        align: textAlignFor("hook", "left"), fontFamily: hFont, weight: hWeight,
         reveal: hookReveal, yOffset,
         color: selectedTextColor(0.94 * hookReveal.alpha, "hook"),
         shadow: textShadowColor("hook"), blur: 20
@@ -2663,7 +2697,7 @@
         renderTextElement({
           key: "subline", text: subText, fullText: fields.subline.value,
           natFit: sub, x: 72, y: startY + hookHeight + 54, maxW: subMaxWidth, lineFactor: 1.34,
-          align: textAlignFor("subline", "left"), fontFamily: bFont,
+          align: textAlignFor("subline", "left"), fontFamily: bFont, weight: bWeight,
           reveal: subReveal, yOffset,
           color: selectedTextColor(0.8 * subReveal.alpha, "subline"),
           shadow: textShadowColor("subline"), blur: 20
@@ -2674,9 +2708,16 @@
     }
 
     function drawBeat(progress, elapsedMs, key, label, text, subtext) {
-      const hFont = headlineFontFamily();
-      const bFont = bodyFontFamily();
-      const labelText = String(label || "").trim();
+      const post = usingPostType();
+      const hFont = post ? POST_TYPE.headline.family : headlineFontFamily();
+      const bFont = post ? POST_TYPE.body.family : bodyFontFamily();
+      const hWeight = post ? POST_TYPE.headline.weight : "700";
+      const bWeight = post ? POST_TYPE.body.weight : "700";
+      const labelFont = post ? POST_TYPE.label.family : hFont;
+      const labelWeight = post ? POST_TYPE.label.weight : "700";
+      const labelSpacing = post ? POST_TYPE.label.letterSpacing : null;
+      const labelRaw = String(label || "").trim();
+      const labelText = post && labelRaw ? labelRaw.toUpperCase() : labelRaw;
       const hasSubtext = String(subtext || "").trim().length > 0;
       const hookStart = 360;
       const subStart = hasSubtext ? hookStart + revealDurationMs(text) + 280 : Infinity;
@@ -2686,35 +2727,40 @@
       const hookMaxWidth = W - 150;
       const subMaxWidth = W - 170;
       const SZ = textSizeScale();
-      const fittedLabel = fitFont(labelText, 94 * SZ, 34 * SZ, labelMaxWidth, hFont, 3);
-      const fitted = fitFont(typed, (key === "beat2" ? 62 : 58) * SZ, 22 * SZ, hookMaxWidth, hFont, 8);
-      const fittedSubtext = hasSubtext ? fitFont(typedSubtext, 34 * SZ, 15 * SZ, subMaxWidth, bFont, 9) : null;
+      const fittedLabel = labelText
+        ? (post
+          ? fitFont(labelText, 34 * SZ, 16 * SZ, labelMaxWidth, labelFont, 2, labelWeight, labelSpacing)
+          : fitFont(labelText, 94 * SZ, 34 * SZ, labelMaxWidth, labelFont, 3, labelWeight))
+        : null;
+      const fitted = fitFont(typed, (key === "beat2" ? 62 : 58) * SZ, 22 * SZ, hookMaxWidth, hFont, 8, hWeight);
+      const fittedSubtext = hasSubtext ? fitFont(typedSubtext, 34 * SZ, 15 * SZ, subMaxWidth, bFont, 9, bWeight) : null;
       const reveal = easeOutCubic(progress);
       const hookReveal = textReveal(elapsedMs, hookStart);
       const subReveal = hasSubtext ? textReveal(elapsedMs, subStart) : { alpha: 0, scale: 1, y: 0 };
-      const labelHeight = labelText ? fittedLabel.lines.length * fittedLabel.size * 1.04 : 0;
-      const labelGap = labelText ? 76 : 0;
+      const labelHeight = fittedLabel ? fittedLabel.lines.length * fittedLabel.size * 1.04 : 0;
+      const labelGap = labelText ? (post ? 40 : 76) : 0;
       const hookHeight = fitted.lines.length * fitted.size * 1.1;
       const subHeight = fittedSubtext ? fittedSubtext.lines.length * fittedSubtext.size * 1.34 : 0;
       const contentHeight = labelHeight + labelGap + hookHeight + (hasSubtext ? 50 + subHeight : 0);
       const contentTop = clamp((H - contentHeight) / 2 - 80, 250, 650);
       const labelY = contentTop;
-      const barY = labelText ? labelY + labelHeight + 28 : contentTop;
-      const hookY = labelText ? barY + 48 : contentTop;
+      const barY = labelText ? labelY + labelHeight + (post ? 16 : 28) : contentTop;
+      const hookY = labelText ? barY + (post ? 28 : 48) : contentTop;
       const subY = hookY + hookHeight + 50;
       const blockYOffset = 28 * (1 - reveal);
 
       // Label — independently movable / resizable (with accent bar)
-      if (labelText) {
+      if (labelText && fittedLabel) {
         renderTextElement({
           key: key + "Label", text: labelText, fullText: labelText,
           natFit: fittedLabel, x: 75, y: labelY, maxW: labelMaxWidth, lineFactor: 1.04,
-          align: textAlignFor(key, "center"), fontFamily: hFont,
+          align: textAlignFor(key, "center"), fontFamily: labelFont, weight: labelWeight,
+          letterSpacing: labelSpacing,
           reveal: null, yOffset: blockYOffset,
           color: selectedTextColor(0.97, key),
           shadow: textShadowColor(key), blur: 20
         });
-        const lb = boxes[key + "Label"];
+        const lb = activeBoxes[key + "Label"];
         ctx.save();
         ctx.translate(0, blockYOffset);
         ctx.fillStyle = COLORS.sage;
@@ -2729,7 +2775,7 @@
       renderTextElement({
         key, text: typed, fullText: text,
         natFit: fitted, x: 75, y: hookY, maxW: hookMaxWidth, lineFactor: 1.1,
-        align: textAlignFor(key, "center"), fontFamily: hFont,
+        align: textAlignFor(key, "center"), fontFamily: hFont, weight: hWeight,
         reveal: hookReveal, yOffset: blockYOffset,
         color: selectedTextColor(0.9 * hookReveal.alpha, key),
         shadow: textShadowColor(key), blur: 18
@@ -2740,7 +2786,7 @@
         renderTextElement({
           key: key + "Sub", text: typedSubtext, fullText: subtext,
           natFit: fittedSubtext, x: 85, y: subY, maxW: subMaxWidth, lineFactor: 1.34,
-          align: textAlignFor(key + "Subtext", "center"), fontFamily: bFont,
+          align: textAlignFor(key + "Subtext", "center"), fontFamily: bFont, weight: bWeight,
           reveal: subReveal, yOffset: blockYOffset,
           color: selectedTextColor(0.78 * subReveal.alpha, key + "Subtext"),
           shadow: textShadowColor(key + "Subtext"), blur: 18

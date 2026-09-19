@@ -1,4 +1,4 @@
-const CACHE = "sattva-reel-v21";
+const CACHE = "sattva-reel-v22";
 const ASSETS = [
   "./",
   "./index.html",
